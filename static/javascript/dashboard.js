@@ -1,17 +1,13 @@
-
-
 getAndRenderTeamsData()
-// initWsListener()
+initWsListener()
 
-// function initWsListener() {
-//     const socket = new WebSocket(`ws://${window.location.host}/ws/teamupdates`);
-//       socket.addEventListener('message', ev => {
-//         const newTeams = JSON.parse(ev.data)
-//         // TODO update the data live or face 
-//         // STALE WRITES!!!!!!!!!!!!!!
-//         renderScoreboard(newTeams)
-//       });
-// }
+function initWsListener() {
+    const socket = new WebSocket(`ws://${window.location.host}/ws/teamupdates`);
+      socket.addEventListener('message', ev => {
+        const newTeams = JSON.parse(ev.data)
+        renderTeamEditRows(newTeams)
+      });
+}
 
 function renderTeamEditRows(teamsData) {
     document.getElementById("teamsEditRow").innerHTML = ""

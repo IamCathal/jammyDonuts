@@ -1,0 +1,171 @@
+@font-face {
+    font-family: 'Helveteca Neue Heavy'; /*a name to be used later*/
+    src: url('../fonts/HelveticaNeueHv.ttf'); /*URL to font*/
+}
+
+* {
+    font-family: 'Roboto Condensed', sans-serif;
+    color: white;
+}
+
+body {
+    /* background-image: url('images/backgroundDarkMode.jpg'); */
+    background-color:#141314;
+}
+
+a {
+    color: white;
+    text-decoration: underline;
+}
+
+.gradientTitleText {
+    background: linear-gradient(256deg, rgba(13,94,201,1) 0%, rgba(0,134,23,1) 31%, rgba(15,175,219,1) 50%, rgba(103,0,129,0.5676471272102591) 74%, rgba(212,0,184,1) 100%);
+    animation: progress-animation 20s linear alternate infinite;
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+.cardNumbers {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+}
+
+.text-shadow {
+    text-shadow:  0px 0px 4px #141314
+}
+
+.row {
+    border: 1px solid purple;
+}
+
+.col {
+    border: 1px solid #e8da0e
+}
+
+.scoreboardLegendText {
+    font-size: 0.8rem;
+    color: #969696;
+}
+
+.scoreboardRegularText {
+    font-size: 1.4rem;
+}
+
+.outlineText {
+    -webkit-text-stroke-width: 2px;
+
+    -webkit-text-fill-color: transparent;
+    animation: progress-animation 80s linear infinite;
+}
+
+.paragraphText {
+    line-height: 1.2rem;
+}
+
+.box {
+    padding: 10px 5px 10px 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 8px;
+}
+
+.boxWithBorder {
+    padding: 10px 5px 10px 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border: 0.2rem solid grey;
+    border-radius: 0.3rem;
+}
+
+.lightBorder {
+    border: 0.1rem solid grey
+}
+
+
+/* https://cssgradient.io/ */
+.progress-bar-one {
+    display: block;
+    height: 100%;
+    background: linear-gradient(69deg, rgba(13,116,125,1) 0%, rgba(111,0,134,1) 26%, rgba(219,15,113,1) 50%, rgba(0,129,102,0.5676471272102591) 74%, rgba(13,116,125,1) 100%);
+    background-size: 300% 100%;
+    animation: progress-animation 120s linear alternate infinite;
+}
+.progress-bar-two {
+    display: block;
+    height: 100%;
+    background: linear-gradient(256deg, rgba(13,94,201,1) 0%, rgba(0,134,23,1) 31%, rgba(15,175,219,1) 50%, rgba(103,0,129,0.5676471272102591) 74%, rgba(212,0,184,1) 100%);
+    background-size: 300% 100%;
+    animation: progress-animation 90s linear alternate infinite;
+}
+.progress-bar-three {
+    display: block;
+    height: 100%;
+    background: linear-gradient(256deg, rgba(36,6,133,1) 0%, rgba(0,134,131,1) 31%, rgba(15,219,136,1) 50%, rgba(129,0,121,0.5676471272102591) 74%, rgba(195,59,177,1) 100%); 
+    background-size: 300% 100%;
+    animation: progress-animation 106s linear alternate infinite;
+}
+.progress-bar-debitcard {
+    display: block;
+    height: 100%;
+    background: radial-gradient(circle, rgba(125,13,175,1) 0%, rgba(1,176,210,1) 100%); 
+    background-size: 300% 100%;
+    animation: progress-animation 11s linear alternate infinite;
+}
+.progress-bar-card {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(19,19,20,1) 0%, rgba(60,62,74,1) 100%); 
+    background-size: 300% 100%;
+    animation: progress-animation 11s linear alternate infinite;
+}
+.bigGradient {
+    background: linear-gradient(256deg, rgba(36,6,133,1) 0%, rgba(0,134,131,1) 31%, rgba(15,219,136,1) 50%, rgba(129,0,121,0.5676471272102591) 74%, rgba(195,59,177,1) 100%); 
+    animation: progress-animation 2s linear alternate infinite;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;  /* <- here it is */
+}
+.progress-bar-tools-and-tech {
+    display: block;
+    background: radial-gradient(circle, rgba(125,13,175,1) 0%, rgba(1,176,210,1) 100%); 
+    background-size: 300% 100%;
+    animation: progress-animation 11s linear alternate infinite;
+}
+.progress-bar-picture-frame {
+    background: linear-gradient(69deg, rgba(13,116,125,1) 0%, rgba(111,0,134,1) 26%, rgba(219,15,113,1) 50%, rgba(0,129,102,0.5676471272102591) 74%, rgba(13,116,125,1) 100%);
+    background-size: 300% 100%;
+    animation: progress-animation 12s linear alternate infinite;
+}
+.dividerTextBar {
+    background: linear-gradient(69deg, rgba(13,116,125,1) 0%, rgba(111,0,134,1) 26%, rgba(219,15,113,1) 50%, rgba(0,129,102,0.5676471272102591) 74%, rgba(13,116,125,1) 100%);
+    background-size: 300% 100%;
+    animation: progress-animation 12s linear alternate infinite;
+}
+
+@keyframes progress-animation {
+    0% {
+        background-position: 100%;
+    }
+    100% {
+        background-position: 0;
+    }
+}
+
+/* Crawl progress bar */
+.crawlProgressBar {
+    margin: 0rem 0.2rem;
+    height: 0.7rem;
+    background: #22242f;
+    /* background: #e1e4e8; */
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+.crawlProgressBarSpan{
+    /* width: 12%; */
+    display: block;
+    height: 100%;
+    background: linear-gradient(32deg,#ffd33d,#ea4aaa 20%,#b34bff 30%,#4787dc 50%,#ffd33d 70%,#ea4aaa 80%,#b34bff);
+    background-size: 300% 100%;
+    animation: progress-animation 3s linear infinite;
+  }

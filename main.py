@@ -2,13 +2,18 @@ import redis
 import util
 import validate
 import json
-from flask import Flask, Response, request
+from flask import Flask, Response, request, send_from_directory
 
 db = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 app = Flask(__name__)
 
 def main():
     app.run(host='0.0.0.0', port=9095)
+
+@app.route("/")
+def index():
+    return send_from_directory("pages", "index.html")
+
 @app.route("/getteams")
 def getTeams():
     res = json.dumps(util.getTeamsFromDB(db))

@@ -5,7 +5,7 @@ JAM_DONUTS_PREFIX = "jamDonuts-"
 TEAMS = "teams"
 
 def set(db, var: str, val: str):
-    print(f"Set '{var}' as '{val}'")
+    # print(f"Set '{var}' as '{val}'")
     val = json.dumps(val)
     db.set(f"{JAM_DONUTS_PREFIX}{var}", val )
 
@@ -21,7 +21,6 @@ def getTeam(db: dict, teamId: str) -> dict:
     for team in teams:
         if team["id"] == teamId:
             return team
-    print("no found team")
     return None
 
 def doesTeamExist(db, teamId: str) -> dict:
@@ -40,8 +39,6 @@ def addANewTeam(db, newTeam):
     newTeam["id"] = str(uuid.uuid1())
 
     currTeams = getTeamsFromDB(db)
-    print(f"Curr teams are '{currTeams}' ({type(currTeams)}) ({len(currTeams)})")
-    print(f"Curr team is '{newTeam}'")
 
     for team in currTeams:
         if team["name"] == newTeam["name"]:
@@ -49,8 +46,24 @@ def addANewTeam(db, newTeam):
             return
 
     currTeams.append(newTeam)
-    print(f"update teams are '{currTeams}' ({type(currTeams)}) ({len(currTeams)})")
     set(db, TEAMS, currTeams)
+    db.publish('teamsUpdates', json.dumps(currTeams))
+
+def updateTeam(db, teamToUpdate):
+    if doesTeamExist(db, teamToUpdate["id"]) == False:
+        return False
+    
+    allTeams = getTeamsFromDB(db)
+    updatedAllTeams = []
+    for team in allTeams:
+        if team["id"] == teamToUpdate["id"]:
+            updatedAllTeams.append(teamToUpdate)
+        else:
+            updatedAllTeams.append(team)
+
+    set(db, TEAMS, updatedAllTeams)
+    db.publish('teamsUpdates', json.dumps(updatedAllTeams))
+    return True
 
 
 def updateScoreForTeam(db, teamId: str, newScore: int):
@@ -64,6 +77,7 @@ def updateScoreForTeam(db, teamId: str, newScore: int):
             team["score"] = int(newScore)
 
     set(db, TEAMS, allTeams)
+    db.publish('teamsUpdates', json.dumps(allTeams))
 
 def addMember(db, teamId: str, memberName: str):
     if doesTeamExist(db, teamId) == False:
@@ -77,6 +91,7 @@ def addMember(db, teamId: str, memberName: str):
             team["members"] = list(dict.fromkeys(team["members"]))
 
     set(db, TEAMS, allTeams)
+    db.publish('teamsUpdates', json.dumps(allTeams))
     return True
 
 def removeMember(db, teamId: str, memberName: str):

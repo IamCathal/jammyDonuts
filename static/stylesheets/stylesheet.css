@@ -36,13 +36,13 @@ a {
     text-shadow:  0px 0px 4px #141314
 }
 
-.row {
+/* .row {
     border: 1px solid purple;
 }
 
 .col {
     border: 1px solid #e8da0e
-}
+} */
 
 .scoreboardLegendText {
     font-size: 0.8rem;
@@ -168,4 +168,16 @@ a {
     background: linear-gradient(32deg,#ffd33d,#ea4aaa 20%,#b34bff 30%,#4787dc 50%,#ffd33d 70%,#ea4aaa 80%,#b34bff);
     background-size: 300% 100%;
     animation: progress-animation 3s linear infinite;
+  }
+
+  .teamInput {
+      background-color: #22242f;
+      border: 1px solid #c0c0c0;
+      width: 90%;
+  }
+
+  .updateTeamButton {
+      background-color: #22242f;
+      color: white;
+      width: 100%
   }

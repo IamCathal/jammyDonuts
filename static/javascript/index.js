@@ -1,10 +1,12 @@
 let lastUpdatedTime = new Date();
 let recentScoreUpdateLogs = []
 
+const MAX_LENGTH_LOGS = 15
 const LOG_BACKGROUND_COLORS = ["#211d21", "#292729"]
 let backGroundColorPicker = 0
 
 getAndRenderScoreboardData()
+getAndRenderMostRecentScoreUpdates()
 initWsTeamUpdateListener()
 initWsScoreUpdateListener()
 
@@ -38,7 +40,7 @@ function initWsScoreUpdateListener() {
         `
         backGroundColorPicker++;
         recentScoreUpdateLogs.push(currFullLog)
-        const MAX_LENGTH_LOGS = 15
+        console.log(recentScoreUpdateLogs.length)
         if (recentScoreUpdateLogs.length > MAX_LENGTH_LOGS) {
             recentScoreUpdateLogs = recentScoreUpdateLogs.slice(1, MAX_LENGTH_LOGS+1)
         }
@@ -112,10 +114,59 @@ function getAndRenderScoreboardData() {
     })
 }
 
+function getAndRenderMostRecentScoreUpdates() {
+    getRecentScoreboardUpdates().then(recentUpdates => {
+        document.getElementById("scoreUpdateLogCol").innerHTML = ""
+        recentUpdates.forEach(recentUpdate => {
+            const now = new Date()
+            const currTimeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+            const currFullLog = 
+            `
+            <div class="row teamScoreUpdateLogText pt-2 pb-2 pl-1 pr-1 mt-0 mb-0 ml-2" style="background-color: ${LOG_BACKGROUND_COLORS[backGroundColorPicker % LOG_BACKGROUND_COLORS.length]}">
+                <div class="col-10">
+                    ${recentUpdate}
+                </div>
+                <div class="col" style="color:#c0c0c0">
+                    ${currTimeString}
+                </div>
+            </div>
+            `
+            recentScoreUpdateLogs.push(currFullLog)
+            console.log(recentScoreUpdateLogs.length)
+            if (recentScoreUpdateLogs.length > MAX_LENGTH_LOGS) {
+                recentScoreUpdateLogs = recentScoreUpdateLogs.slice(1, MAX_LENGTH_LOGS+1)
+            }
+
+
+            backGroundColorPicker++;
+            document.getElementById("scoreUpdateLogCol").innerHTML = currFullLog + document.getElementById("scoreUpdateLogCol").innerHTML;
+        })
+    }, (err) => {
+        console.error(err)
+    })
+}
+
 
 function getScoreboardData() {
     return new Promise((resolve, reject) => {
         fetch(`/getteams`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        }).then((res) => res.json())
+        .then((res) => {
+            resolve(res)
+        }, (err) => {
+            reject(err)
+        });
+    })
+}
+
+function getRecentScoreboardUpdates() {
+    return new Promise((resolve, reject) => {
+        fetch(`/getrecentscoreupdates`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

@@ -32,13 +32,13 @@ def main():
 def updateThread():
     while True:
         util.updateScoreForTeam(db, "b95cd33e-a345-11ed-86e1-40167eaa9d32", random.randint(1, 1099))
-        sleep(0.8)
+        sleep(1.8)
         util.updateScoreForTeam(db, "2575f65c-a401-11ed-b810-40167eaa9d32", random.randint(1, 1099))
-        sleep(0.2)
+        sleep(1.2)
         util.updateScoreForTeam(db, "fd0980d4-a41a-11ed-93f1-40167eaa9d32", random.randint(1, 2300))
-        sleep(0.7)
+        sleep(1.7)
         util.updateScoreForTeam(db, "c5639962-a41a-11ed-affe-40167eaa9d32", random.randint(1, 1400))
-        sleep(0.5)
+        sleep(2.5)
 
 @sock.route("/ws/teamupdates")
 def teamUpdates(ws):
@@ -108,6 +108,20 @@ def addTeam():
         res = {"error": "Team object was invalid"}
         return Response(json.dumps(res), status=400, mimetype='application/json')
 
+@app.route("/removeteam", methods=["POST"])
+def removeTeam():
+    teamId = request.args.get("teamid", "")
+    if teamId == "":
+        res = {"error": "Team name or membername was empty"}
+        return Response(json.dumps(res), status=400, mimetype='application/json')
+
+    if util.removeTeam(db, teamId) == False:
+        res = {"error": f"TeamId {teamId} does not exist"}
+        return Response(json.dumps(res), status=400, mimetype='application/json')
+
+    return Response(json.dumps(util.getTeamsFromDB(db)), status=200, mimetype='application/json')
+
+    
 @app.route("/addmember", methods=["POST"])
 def addMember():
     teamId = request.args.get("teamid", "")

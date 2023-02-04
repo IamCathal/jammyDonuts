@@ -81,8 +81,13 @@ function renderTeamEditRows(teamsData) {
                         Update team
                     </button>
                 </div>
-                <div class="col" id="${team.id}-requestInfoBox">
+                <div class="col-8" id="${team.id}-requestInfoBox">
                    
+                </div>
+                <div class="col-2">
+                    <button class="deleteTeamButton" id="${team.id}-deleteTeamButton">
+                        Delete
+                    </button>
                 </div>
             </div>
         </div>
@@ -112,6 +117,20 @@ function renderTeamEditRows(teamsData) {
                 getAndRenderTeamsData()
             }, err => {
                 document.getElementById(`${teamID}-requestInfoBox`).textContent = err
+                console.error(err)
+            })
+        })
+    })
+
+    document.querySelectorAll(".deleteTeamButton").forEach(elem => {
+        elem.addEventListener("click", (ev) => {
+            // This is dirty and shameful but
+            const teamID = ev.target.id.split("-deleteTeamButton")[0]; 
+  
+            removeTeam(teamID).then(res => {
+                // getAndRenderTeamsData()
+            }, err => {
+                // document.getElementById(`${teamID}-requestInfoBox`).textContent = err
                 console.error(err)
             })
         })
@@ -181,6 +200,23 @@ function getScoreboardData() {
     return new Promise((resolve, reject) => {
         fetch(`/getteams`, {
             method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        }).then((res) => res.json())
+        .then((res) => {
+            resolve(res)
+        }, (err) => {
+            reject(err)
+        });
+    })
+}
+
+function removeTeam(teamId) {
+    return new Promise((resolve, reject) => {
+        fetch(`/removeteam?teamid=${teamId}`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"

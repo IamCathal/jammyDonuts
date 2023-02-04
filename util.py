@@ -115,6 +115,22 @@ def removeMember(db, teamId: str, memberName: str):
                 return False
 
     set(db, TEAMS, allTeams)
+    db.publish("teamUpdates", allTeams)
+    return True
+
+def removeTeam(db, teamId: str) -> bool:
+    if doesTeamExist(db, teamId) == False:
+        print(f"team {teamId} does not exist")
+        return False
+
+    allTeams = getTeamsFromDB(db)
+    allTeamsWithoutRequestToBeDeletedTeam = []
+    for team in allTeams:
+        if team["id"] != teamId:
+            allTeamsWithoutRequestToBeDeletedTeam.append(team)
+            
+    set(db, TEAMS, allTeamsWithoutRequestToBeDeletedTeam)
+    db.publish("teamUpdates", allTeamsWithoutRequestToBeDeletedTeam)
     return True
 
 def getRecentScoreUpdates(db):

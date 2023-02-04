@@ -118,6 +118,34 @@ function renderTeamEditRows(teamsData) {
     })
 }
 
+document.getElementById("createTeam-createTeamButton").addEventListener("click", () => {
+    const newTeamName = document.getElementById(`createTeam-name`).value
+    const newTeamMembers = []
+    document.querySelectorAll(`.teamMemberInput`).forEach(teamMemberBox => {
+        if (teamMemberBox.id.startsWith("createTeam") && teamMemberBox.value != "") {
+            newTeamMembers.push(teamMemberBox.value)
+        }
+    })
+    const newTeamScore = document.getElementById(`createTeam-score`).value
+    createTeam(newTeamName, newTeamMembers, newTeamScore).then(res => {
+        document.getElementById(`createTeam-requestInfoBox`).textContent = "Successfully created new team"
+        clearInputsForCreateTeam()
+    }, (err) => {
+        console.error(err)
+        document.getElementById(`createTeam-requestInfoBox`).textContent = "Failed to create team. Check webpage console"
+    })
+});
+
+function clearInputsForCreateTeam() {
+    document.getElementById(`createTeam-name`).value = ""
+    document.querySelectorAll(`.teamMemberInput`).forEach(teamMemberBox => {
+        if (teamMemberBox.id.startsWith("createTeam") && teamMemberBox.value != "") {
+            document.getElementById(teamMemberBox.id).value = ""
+        }
+        document.getElementById(`createTeam-score`).value = ""
+    })
+}
+
 function getAndRenderTeamsData() {
     getScoreboardData().then((teams) => {
         renderTeamEditRows(teams)
@@ -162,6 +190,33 @@ function getScoreboardData() {
             resolve(res)
         }, (err) => {
             reject(err)
+        });
+    })
+}
+
+function createTeam(teamName, teamMembers, newTeamScore) {
+    return new Promise((resolve, reject) => {
+        fetch(`/addteam`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                "name": teamName,
+                "members": teamMembers,
+                "score": newTeamScore
+            })
+        })
+        .then((res) => {
+            if (res.status == 400) {
+                console.error(res)
+                reject(res)
+            } else {
+                resolve(res.json())
+            }
+        }, (err) => {
+            reject(err.json())
         });
     })
 }

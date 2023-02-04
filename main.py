@@ -15,19 +15,9 @@ sock = Sock(app)
 
 def main():
     update = Thread(target=updateThread)
-    # watch = Thread(target=watchMonitor)
     update.start()
-    # watch.start()
     app.run(host='0.0.0.0', port=9095)
 
-# def watchMonitor():
-#     subscription = db.pubsub()
-#     subscription.subscribe("teamsUpdates")
-#     while True:
-#         for message in subscription.listen():
-#             print(f"message: {message['data']}\n\n\n\n")
-#             if message is not None and validate.isValidTeam(message['data']):
-#                 print(f"A NEW ONE: {message['data']}")
 
 def updateThread():
     while True:
@@ -40,6 +30,7 @@ def updateThread():
         util.updateScoreForTeam(db, "c5639962-a41a-11ed-affe-40167eaa9d32", random.randint(1, 1400))
         sleep(2.5)
 
+
 @sock.route("/ws/teamupdates")
 def teamUpdates(ws):
     subscription = db.pubsub()
@@ -48,6 +39,7 @@ def teamUpdates(ws):
         for message in subscription.listen():
             if message["data"] is not None and isinstance(message["data"], str):
                 ws.send(message["data"])
+
 
 
 @sock.route("/ws/scoreupdates")
@@ -61,14 +53,17 @@ def scoreUpdates(ws):
                 util.addRecentScoreUpdate(db, message["data"])
                 ws.send(message["data"])
 
+
 @app.route("/getrecentscoreupdates")
 def getRecentScoreUpdates():
     res = json.dumps(util.getRecentScoreUpdates(db))
     return Response(res, status=200, mimetype='application/json')
 
+
 @app.route("/")
 def index():
     return send_from_directory("pages", "index.html")
+
 
 @app.route("/dashboard")
 def dashboard():
@@ -77,10 +72,12 @@ def dashboard():
         return send_from_directory("pages", "index.html")
     return send_from_directory("pages", "dashboard.html")
 
+
 @app.route("/getteams")
 def getTeams():
     res = json.dumps(util.getTeamsFromDB(db))
     return Response(res, status=200, mimetype='application/json')
+
 
 @app.route("/getteam")
 def getTeam():
@@ -97,6 +94,7 @@ def getTeam():
 
     return Response(json.dumps(team), status=200, mimetype='application/json')
 
+
 @app.route("/addteam", methods=["POST"])
 def addTeam():
     team = request.get_json()
@@ -107,6 +105,7 @@ def addTeam():
     else:
         res = {"error": "Team object was invalid"}
         return Response(json.dumps(res), status=400, mimetype='application/json')
+
 
 @app.route("/removeteam", methods=["POST"])
 def removeTeam():
@@ -137,6 +136,7 @@ def addMember():
 
     return Response(json.dumps(util.getTeam(db, teamId)), status=400, mimetype='application/json')
 
+
 @app.route("/removemember", methods=["POST"])
 def removeMember():
     teamId = request.args.get("teamid", "")
@@ -151,6 +151,7 @@ def removeMember():
         return Response(json.dumps(res), status=400, mimetype='application/json')
 
     return Response(json.dumps(util.getTeam(db, teamId)), status=400, mimetype='application/json')
+
 
 @app.route("/updatescore", methods=["POST"])
 def updateScore():
@@ -167,6 +168,7 @@ def updateScore():
 
     return Response(json.dumps(util.getTeam(db, teamId)), status=200, mimetype='application/json')
 
+
 @app.route("/updateteam", methods=["POST"])
 def updateTeam():
     teamToUpdate = request.get_json()
@@ -179,6 +181,42 @@ def updateTeam():
         return Response(json.dumps(res), status=400, mimetype='application/json')
 
     return Response(json.dumps(util.getTeam(db, teamToUpdate["id"])), status=400, mimetype='application/json')
+
+
+@app.route("/addproblem", methods=["POST"])
+def addProblem():
+    problemToAdd = request.get_json()
+    if validate.isValidProblem(problemToAdd) == False:
+        res = {"error": "Problem is invalid"}
+        return Response(json.dumps(res), status=400, mimetype='application/json')
+
+    util.addProblem(db, problemToAdd)
+    return Response(json.dumps(util.getProblem(db, problemToAdd["problemId"])), status=200, mimetype='application/json')
+
+@app.route("/getproblems")
+def getProblems():
+    return Response(json.dumps(util.getProblemsFromDb(db)), status=200, mimetype='application/json')
+
+@app.route("/getproblem")
+def getProblem():
+    problemId = request.args.get("problemid", "")
+    if problemId is None or problemId == "":
+        res = {"error": "Invalid problemId given"}
+        return Response(json.dumps(res), status=400, mimetype='application/json')
+    
+    problem = util.getProblem(db, problemId)
+    if problem is None:
+        res = {"error": f"Could not find problem with Id {problemId}"}
+        return Response(json.dumps(res), status=400, mimetype='application/json')
+    
+    return Response(json.dumps(problem), status=200, mimetype='application/json')
+
+# @app.route("/editproblem")
+# def editproblem():
+#     problemId = request.args.get("problemid", "")
+#     if problemId is None or problemId == "":
+#         res = {"error": "Invalid problemId given"}
+#         return Response(json.dumps(res), status=400, mimetype='application/json')
 
 if __name__ == "__main__":
     main()

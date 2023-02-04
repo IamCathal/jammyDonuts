@@ -5,17 +5,36 @@ import uuid
 JAM_DONUTS_PREFIX = "jamDonuts-"
 TEAMS = "teams"
 SCORE_UPDATES = "scoreUpdateLogs"
+PROBLEMS = "problems"
 
 def set(db, var: str, val: str):
     # print(f"Set '{var}' as '{val}'")
     val = json.dumps(val)
     db.set(f"{JAM_DONUTS_PREFIX}{var}", val )
 
+
 def getTeamsFromDB(db):
     teams = db.get(f"{JAM_DONUTS_PREFIX}{TEAMS}")
     if teams == "[]" or teams == None:
         return []
     return json.loads(teams)
+
+def getProblemsFromDb(db):
+    problems = db.get(f"{JAM_DONUTS_PREFIX}{PROBLEMS}")
+    if problems == "[]" or PROBLEMS == None:
+        return []
+    return json.loads(problems)
+
+
+def getProblemFromDB(db, problemId: str):
+    problems = getProblemsFromDb(db)
+
+    for problem in problems:
+        if problem["problemId"] == problemId:
+            return problem
+
+    return None
+
 
 def getTeam(db: dict, teamId: str) -> dict:
     teams = getTeamsFromDB(db)
@@ -25,6 +44,7 @@ def getTeam(db: dict, teamId: str) -> dict:
             return team
     return None
 
+
 def doesTeamExist(db, teamId: str) -> dict:
     allTeams = getTeamsFromDB(db)
     for team in allTeams:
@@ -32,8 +52,17 @@ def doesTeamExist(db, teamId: str) -> dict:
             return True
     return False
 
+def doesProblemExist(db, problemId: str) -> dict:
+    allProblems = getProblemsFromDb(db)
+    for problem in allProblems:
+        if problem["problemId"] == problemId:
+            return True
+    return False
+
+
 def addTeam(db, team):
     set(db, TEAMS, json.dumps(team))
+
 
 def addANewTeam(db, newTeam):
     newTeam["score"] = 0
@@ -49,6 +78,7 @@ def addANewTeam(db, newTeam):
     currTeams.append(newTeam)
     set(db, TEAMS, currTeams)
     db.publish('teamsUpdates', json.dumps(currTeams))
+
 
 def updateTeam(db, teamToUpdate):
     if doesTeamExist(db, teamToUpdate["id"]) == False:
@@ -85,6 +115,7 @@ def updateScoreForTeam(db, teamId: str, newScore: int):
     db.publish("scoreUpdate", scoreUpdateString)
     db.publish('teamsUpdates', json.dumps(allTeams))
 
+
 def addMember(db, teamId: str, memberName: str):
     if doesTeamExist(db, teamId) == False:
         print(f"team {teamId} does not exist")
@@ -99,6 +130,7 @@ def addMember(db, teamId: str, memberName: str):
     set(db, TEAMS, allTeams)
     db.publish('teamsUpdates', json.dumps(allTeams))
     return True
+
 
 def removeMember(db, teamId: str, memberName: str):
     if doesTeamExist(db, teamId) == False:
@@ -118,6 +150,7 @@ def removeMember(db, teamId: str, memberName: str):
     db.publish("teamUpdates", allTeams)
     return True
 
+
 def removeTeam(db, teamId: str) -> bool:
     if doesTeamExist(db, teamId) == False:
         print(f"team {teamId} does not exist")
@@ -133,11 +166,13 @@ def removeTeam(db, teamId: str) -> bool:
     db.publish("teamUpdates", allTeamsWithoutRequestToBeDeletedTeam)
     return True
 
+
 def getRecentScoreUpdates(db):
     scoreUpdates = db.get(f"{JAM_DONUTS_PREFIX}{SCORE_UPDATES}")
     if scoreUpdates == "[]" or scoreUpdates == None:
         return []
     return json.loads(scoreUpdates)
+
 
 def addRecentScoreUpdate(db, newScoreUpdate):
     allScoreUpdates = getRecentScoreUpdates(db)
@@ -145,3 +180,29 @@ def addRecentScoreUpdate(db, newScoreUpdate):
     if len(allScoreUpdates) > 20:
         allScoreUpdates = allScoreUpdates[:20]
     set(db, SCORE_UPDATES, allScoreUpdates)
+
+
+def addProblem(db, problemToAdd: dict):
+    currentProblems = db.get(f"{JAM_DONUTS_PREFIX}{PROBLEMS}")
+    if currentProblems == "[]" or currentProblems == None:
+        currentProblems = []
+    else:
+        currentProblems = json.loads(currentProblems)
+
+    problemToAdd["problemIndex"] = len(currentProblems)
+    problemToAdd["problemId"] = str(uuid.uuid1())
+    currentProblems.append(problemToAdd)
+
+    set(db, PROBLEMS, currentProblems)
+
+def getProblem(db, problemId: str) -> dict:
+    return getProblemFromDB(db, problemId)
+
+# def editProblem(db, problemId: str):
+#     if doesProblemExist(db, problemId) == False:
+#         return False
+
+#     allProblems = getProblemsFromDb(db)
+#     allProblemsWithRequestedEdit
+#     for problem in allProblems:
+#         if problem["problemId"] == problemId

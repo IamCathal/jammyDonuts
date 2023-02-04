@@ -1,8 +1,10 @@
 import json
+from this import d
 import uuid
 
 JAM_DONUTS_PREFIX = "jamDonuts-"
 TEAMS = "teams"
+SCORE_UPDATES = "scoreUpdateLogs"
 
 def set(db, var: str, val: str):
     # print(f"Set '{var}' as '{val}'")
@@ -29,7 +31,6 @@ def doesTeamExist(db, teamId: str) -> dict:
         if team["id"] == teamId:
             return True
     return False
-
 
 def addTeam(db, team):
     set(db, TEAMS, json.dumps(team))
@@ -72,11 +73,16 @@ def updateScoreForTeam(db, teamId: str, newScore: int):
         return
     
     allTeams = getTeamsFromDB(db)
+    scoringTeam = ""
     for team in allTeams:
         if team["id"] == teamId:
+            scoreDifference = int(newScore) - team["score"]
             team["score"] = int(newScore)
+            scoringTeam = team["name"]
 
     set(db, TEAMS, allTeams)
+    scoreUpdateString = f"{scoringTeam} gained {scoreDifference} points"
+    db.publish("scoreUpdate", scoreUpdateString)
     db.publish('teamsUpdates', json.dumps(allTeams))
 
 def addMember(db, teamId: str, memberName: str):
@@ -110,3 +116,16 @@ def removeMember(db, teamId: str, memberName: str):
 
     set(db, TEAMS, allTeams)
     return True
+
+def getRecentScoreUpdates(db):
+    scoreUpdates = db.get(f"{JAM_DONUTS_PREFIX}{SCORE_UPDATES}")
+    if scoreUpdates == "[]" or scoreUpdates == None:
+        return []
+    return json.loads(scoreUpdates)
+
+def addRecentScoreUpdate(db, newScoreUpdate):
+    allScoreUpdates = getRecentScoreUpdates(db)
+    allScoreUpdates.insert(0, newScoreUpdate)
+    if len(allScoreUpdates) > 20:
+        allScoreUpdates = allScoreUpdates[:20]
+    set(db, SCORE_UPDATES, allScoreUpdates)

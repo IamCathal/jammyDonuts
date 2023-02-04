@@ -1,12 +1,53 @@
+let lastUpdatedTime = new Date();
+let recentScoreUpdateLogs = []
+
+const LOG_BACKGROUND_COLORS = ["#211d21", "#292729"]
+let backGroundColorPicker = 0
 
 getAndRenderScoreboardData()
-initWsListener()
+initWsTeamUpdateListener()
+initWsScoreUpdateListener()
 
-function initWsListener() {
+function initWsTeamUpdateListener() {
     const socket = new WebSocket(`ws://${window.location.host}/ws/teamupdates`);
       socket.addEventListener('message', ev => {
         const newTeams = JSON.parse(ev.data)
+        document.getElementById("lastUpdatedInfo").textContent = `Last updated ${timeSince(lastUpdatedTime)} ago`;
+        lastUpdatedTime = new Date()
         renderScoreboard(newTeams)
+      });
+}
+
+function initWsScoreUpdateListener() {
+    const socket = new WebSocket(`ws://${window.location.host}/ws/scoreupdates`);
+      socket.addEventListener('message', ev => {
+        const newScoreText = ev.data
+
+        const now = new Date();
+        const currTimeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+        const currFullLog = 
+        `
+        <div class="row teamScoreUpdateLogText pt-2 pb-2 pl-1 pr-1 mt-0 mb-0 ml-2" style="background-color: ${LOG_BACKGROUND_COLORS[backGroundColorPicker % LOG_BACKGROUND_COLORS.length]}">
+            <div class="col-10">
+                ${newScoreText}
+            </div>
+            <div class="col" style="color:#c0c0c0">
+                ${currTimeString}
+            </div>
+        </div>
+        `
+        backGroundColorPicker++;
+        recentScoreUpdateLogs.push(currFullLog)
+        const MAX_LENGTH_LOGS = 15
+        if (recentScoreUpdateLogs.length > MAX_LENGTH_LOGS) {
+            recentScoreUpdateLogs = recentScoreUpdateLogs.slice(1, MAX_LENGTH_LOGS+1)
+        }
+
+        document.getElementById("scoreUpdateLogCol").innerHTML = ""
+        recentScoreUpdateLogs.forEach(log => {
+            document.getElementById("scoreUpdateLogCol").innerHTML = log + document.getElementById("scoreUpdateLogCol").innerHTML;
+        })
+     
       });
 }
 
@@ -17,7 +58,7 @@ function renderScoreboard(teamsData) {
     let i = 1
 
     teamsData.sort(function(a, b) {
-        return a.score - b.score
+        return b.score - a.score
     })
 
     teamsData.forEach((team) => {
@@ -28,13 +69,16 @@ function renderScoreboard(teamsData) {
             ${i}
         </p>
     </div>
-    <div class="col-8 mt-0 text-center">
+    <div class="col-4 mt-0 text-center">
         <p class="scoreboardRegularText mb-1">
             ${team.name}
         </p>
     </div>
+    <div class="col-4 mt-0 text-center">
+        ${renderTeamNames(team.members)}
+    </div>
     <div class="col text-center">
-        <p class="scoreboardRegularText mb-1">
+        <p class="scoreboardScoreText mb-1">
             ${team.score}
         </p>
     </div>
@@ -44,6 +88,20 @@ function renderScoreboard(teamsData) {
     })
 
     document.getElementById("teamsScoreboardRows").innerHTML = output
+}
+
+function renderTeamNames(members) {
+    let output = `
+    <p class="scoreboardRegularText mb-1">
+`
+    members.forEach(member => {
+        output += `
+            <div class="lightBorder text-center teamMemberScoreboardText pt-1 pb-1 pl-1 pr-1 mt-0 mb-1 ml-2" style="border-radius: 0.2rem; display: inline-block">
+                ${member}
+            </div>
+        `
+    })
+    return output;
 }
 
 function getAndRenderScoreboardData() {
@@ -70,4 +128,23 @@ function getScoreboardData() {
             reject(err)
         });
     })
+}
+
+function timeSince(targetDate) {
+    let seconds = Math.floor((new Date() - targetDate) / 1000)
+    let interval = seconds / 31536000 // years
+    interval = seconds / 2592000; // months
+    interval = seconds / 86400; // days
+    if (interval > 1) {
+        return Math.floor(interval) + "d";
+    }
+    interval = seconds / 3600;
+    if (interval > 1) {
+        return Math.floor(interval) + "h";
+    }
+    interval = seconds / 60;
+    if (interval > 1) {
+        return Math.floor(interval) + "m";
+    }
+    return Math.floor(seconds) + "s";
 }

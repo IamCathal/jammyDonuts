@@ -50,7 +50,23 @@ a {
 }
 
 .scoreboardRegularText {
-    font-size: 1.4rem;
+    font-size: 1.8rem;
+}
+
+.scoreboardScoreText {
+    font-weight: bold;
+    font-size: 2.5rem;
+}
+
+.teamMemberScoreboardText {
+    font-size: 0.8rem;
+    font-weight: bold;
+    line-height: 95%;
+}
+
+.teamScoreUpdateLogText {
+    font-size: 1.2rem;
+    line-height: 89%;
 }
 
 .outlineText {
@@ -78,7 +94,7 @@ a {
 }
 
 .lightBorder {
-    border: 0.1rem solid grey
+    border: 0.1rem solid grey;
 }
 
 

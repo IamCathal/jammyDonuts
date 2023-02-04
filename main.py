@@ -32,11 +32,16 @@ def main():
 def updateThread():
     while True:
         util.updateScoreForTeam(db, "b95cd33e-a345-11ed-86e1-40167eaa9d32", random.randint(1, 1099))
+        sleep(2.3)
         util.updateScoreForTeam(db, "2575f65c-a401-11ed-b810-40167eaa9d32", random.randint(1, 1099))
-        sleep(0.8)
+        sleep(1.1)
+        util.updateScoreForTeam(db, "fd0980d4-a41a-11ed-93f1-40167eaa9d32", random.randint(1, 2300))
+        sleep(2.7)
+        util.updateScoreForTeam(db, "c5639962-a41a-11ed-affe-40167eaa9d32", random.randint(1, 1400))
+        sleep(1.3)
 
 @sock.route("/ws/teamupdates")
-def listen(ws):
+def teamUpdates(ws):
     subscription = db.pubsub()
     subscription.subscribe("teamsUpdates")
     while True:
@@ -45,7 +50,21 @@ def listen(ws):
                 ws.send(message["data"])
 
 
+@sock.route("/ws/scoreupdates")
+def scoreUpdates(ws):
+    subscription = db.pubsub()
+    subscription.subscribe("scoreUpdate")
+    lastTwentyUpdates = []
+    while True:
+        for message in subscription.listen():
+            if message["data"] is not None and isinstance(message["data"], str):
+                util.addRecentScoreUpdate(db, message["data"])
+                ws.send(message["data"])
 
+@app.route("/getrecentscoreupdates")
+def getRecentScoreUpdates():
+    res = json.dumps(util.getRecentScoreUpdates(db))
+    return Response(res, status=200, mimetype='application/json')
 
 @app.route("/")
 def index():

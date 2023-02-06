@@ -14,7 +14,7 @@ function initWsTeamUpdateListener() {
     const socket = new WebSocket(`ws://${window.location.host}/ws/teamupdates`);
       socket.addEventListener('message', ev => {
         const newTeams = JSON.parse(ev.data)
-        document.getElementById("lastUpdatedInfo").textContent = `Last updated ${timeSince(lastUpdatedTime)} ago`;
+        // document.getElementById("lastUpdatedInfo").textContent = `Last updated ${timeSince(lastUpdatedTime)} ago`;
         lastUpdatedTime = new Date()
         renderScoreboard(newTeams)
       });
@@ -97,11 +97,14 @@ function renderTeamNames(members) {
     <p class="scoreboardRegularText mb-1">
 `
     members.forEach(member => {
-        output += `
+        if (member.name != "") {
+            output += `
             <div class="lightBorder text-center teamMemberScoreboardText pt-1 pb-1 pl-1 pr-1 mt-0 mb-1 ml-2" style="border-radius: 0.2rem; display: inline-block">
-                ${member}
+                ${member.name}
             </div>
         `
+        }
+       
     })
     return output;
 }

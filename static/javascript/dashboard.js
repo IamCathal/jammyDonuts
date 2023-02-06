@@ -140,7 +140,7 @@ function renderTeamEditRows(teamsData) {
             //         updatedMembers.push(teamMemberBox.value)
             //     }
             // })
-            // const updatedScore = document.getElementById(`${teamID}-score`).value
+            const updatedScore = parseInt(document.getElementById(`${teamID}-score`).value)
             updatedTeamMembers = getTeamMemberNamesAndEmailsForTeamId(teamID)
   
             updateTeam(teamID, updatedTeamName, updatedTeamMembers, updatedScore).then(res => {
@@ -227,9 +227,7 @@ function getTeamMemberNamesAndEmailsForTeamId(teamID) {
                 teamMemberNames.push(teamMemberBox.value)
             } else if (teamMemberBox.id.includes("-member-email-")) {
                 teamMemberEmails.push(teamMemberBox.value)
-            } else {
-                 console.error("teamMemberInput is not for user email or name")
-             }
+            }
         }
     })
 
@@ -284,9 +282,9 @@ function renderProblems(problems) {
 
             <div class="row pt-2 pb-3">
                 <div class="col-2 text-center">
-                    <button class="createProblemButton" id="createTeam-createTeamButton">
+                    <!-- <button class="createProblemButton" id="createTeam-createTeamButton">
                         Update Problem
-                    </button>
+                    </button> -->
                 </div>
                 <div class="col" id="${problem.problemId}}-requestInfoBox">
                    

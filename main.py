@@ -1,6 +1,7 @@
 from sre_constants import SUCCESS
 import redis
 import util
+import webex
 import validate
 import json
 from flask import Flask, Response, request, send_from_directory
@@ -17,19 +18,25 @@ def main():
     update = Thread(target=updateThread)
     update.start()
     app.run(host='0.0.0.0', port=9095)
+    pass
 
 
 def updateThread():
+    teams = util.getTeamsFromDB(db)
     while True:
-        # util.updateScoreForTeam(db, "b95cd33e-a345-11ed-86e1-40167eaa9d32", random.randint(1, 1099))
-        # sleep(1.8)
-        # util.updateScoreForTeam(db, "2575f65c-a401-11ed-b810-40167eaa9d32", random.randint(1, 1099))
-        # sleep(1.2)
-        # util.updateScoreForTeam(db, "fd0980d4-a41a-11ed-93f1-40167eaa9d32", random.randint(1, 2300))
-        # sleep(1.7)
-        # util.updateScoreForTeam(db, "c5639962-a41a-11ed-affe-40167eaa9d32", random.randint(1, 1400))
-        sleep(2.5)
+        for team in teams:
+            util.updateScoreForTeam(db, team["id"], random.randint(1, 1099))
+            sleep(random.randint(20, 70))
 
+@app.route("/webex/createteamspace", methods=["POST"])
+def createTeamSpace():
+    teamId = request.args.get("teamid", "")
+    if teamId == "":
+        res = {"error": "teamid was empty"}
+        return Response(json.dumps(res), status=400, mimetype='application/json')
+    
+    webex.createTeamSpace(db, api, teamId)
+    return Response("hllo", status=200)
 
 @sock.route("/ws/teamupdates")
 def teamUpdates(ws):
@@ -86,7 +93,6 @@ def getTeam():
         res = {"error": "Team name or membername was empty"}
         return Response(json.dumps(res), status=400, mimetype='application/json')
     
-    print(f"get the team {teamId}")
     team = util.getTeam(db, teamId)
     if team == None:
         res = {"error": "Could not find teamId {teamId}"}
@@ -180,7 +186,7 @@ def updateTeam():
         res = {"error": f"Failed to update team {teamToUpdate['id']}"}
         return Response(json.dumps(res), status=400, mimetype='application/json')
 
-    return Response(json.dumps(util.getTeam(db, teamToUpdate["id"])), status=400, mimetype='application/json')
+    return Response(json.dumps(util.getTeam(db, teamToUpdate["id"])), status=200, mimetype='application/json')
 
 
 @app.route("/addproblem", methods=["POST"])

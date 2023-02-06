@@ -167,6 +167,13 @@ def removeTeam(db, teamId: str) -> bool:
     return True
 
 
+def getTeamName(db, teamId: str) -> str:
+    if doesTeamExist(db, teamId) == False:
+        print(f"team {teamId} does not exist")
+        return False
+        
+    return getTeam(db, teamId)["name"]
+
 def getRecentScoreUpdates(db):
     scoreUpdates = db.get(f"{JAM_DONUTS_PREFIX}{SCORE_UPDATES}")
     if scoreUpdates == "[]" or scoreUpdates == None:

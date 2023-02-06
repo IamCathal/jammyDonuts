@@ -21,13 +21,13 @@ def main():
 
 def updateThread():
     while True:
-        util.updateScoreForTeam(db, "b95cd33e-a345-11ed-86e1-40167eaa9d32", random.randint(1, 1099))
-        sleep(1.8)
-        util.updateScoreForTeam(db, "2575f65c-a401-11ed-b810-40167eaa9d32", random.randint(1, 1099))
-        sleep(1.2)
-        util.updateScoreForTeam(db, "fd0980d4-a41a-11ed-93f1-40167eaa9d32", random.randint(1, 2300))
-        sleep(1.7)
-        util.updateScoreForTeam(db, "c5639962-a41a-11ed-affe-40167eaa9d32", random.randint(1, 1400))
+        # util.updateScoreForTeam(db, "b95cd33e-a345-11ed-86e1-40167eaa9d32", random.randint(1, 1099))
+        # sleep(1.8)
+        # util.updateScoreForTeam(db, "2575f65c-a401-11ed-b810-40167eaa9d32", random.randint(1, 1099))
+        # sleep(1.2)
+        # util.updateScoreForTeam(db, "fd0980d4-a41a-11ed-93f1-40167eaa9d32", random.randint(1, 2300))
+        # sleep(1.7)
+        # util.updateScoreForTeam(db, "c5639962-a41a-11ed-affe-40167eaa9d32", random.randint(1, 1400))
         sleep(2.5)
 
 

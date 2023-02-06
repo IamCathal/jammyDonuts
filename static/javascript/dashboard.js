@@ -15,55 +15,84 @@ function renderTeamEditRows(teamsData) {
     // TODO SANITISE THIS INPUT
     let output = ``
     let i = 1
-
+    
     teamsData.forEach((team) => {
+        console.log(team)
         output += `
     <div class="row mb-3 boxWithBorder lightBorder">
         <div class="col">
             <div class="row pt-1">
-                <div class="col-5">
+                <div class="col-3">
                     <input 
                         id="${team.id}-name"
                         class="teamInput"
                         value="${team.name}"
                     >
                 </div>
-                <div class="col-5 text-center scoreboardLegendText">
+                <div class="col text-center scoreboardLegendText">
                     <div class="row pb-1">
                         <div class="col">
                             <input 
-                                id="${team.id}-member-0"
+                                id="${team.id}-member-name-0"
                                 class="teamInput teamMemberInput"
-                                value="${team.members[0] == undefined ? "" : team.members[0]}"
+                                value="${team.members[0].name == undefined ? "" : team.members[0].name}"
+                            >
+                        </div>
+                        <div class="col">
+                            <input 
+                                id="${team.id}-member-email-0"
+                                class="teamInput teamMemberInput"
+                                value="${team.members[0].email == undefined ? "" : team.members[0].email}"
                             >
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
                             <input 
-                                id="${team.id}-member-1"
+                                id="${team.id}-member-name-1"
                                 class="teamInput teamMemberInput"
-                                value="${team.members[1] == undefined ? "" : team.members[1]}"
+                                value="${team.members[1].name == undefined ? "" : team.members[1].name}"
+                            >
+                        </div>
+                        <div class="col">
+                            <input 
+                                id="${team.id}-member-email-1"
+                                class="teamInput teamMemberInput"
+                                value="${team.members[1].email == undefined ? "" : team.members[1].email}"
                             >
                         </div>
                     </div>
                     <div class="row pb-1">
                         <div class="col">
                             <input 
-                                id="${team.id}-member-2"
+                                id="${team.id}-member-name-2"
                                 class="teamInput teamMemberInput"
-                                value="${team.members[2] == undefined ? "" : team.members[2]}"
+                                value="${team.members[2].name == undefined ? "" : team.members[2].name}"
+                            >
+                        </div>
+                        <div class="col">
+                            <input 
+                                id="${team.id}-member-email-2"
+                                class="teamInput teamMemberInput"
+                                value="${team.members[2].email == undefined ? "" : team.members[2].email}"
                             >
                         </div>
                     </div>
                     <div class="row pb-1">
                         <div class="col">
                             <input 
-                                id="${team.id}-member-3"
+                                id="${team.id}-member-name-3"
                                 class="teamInput teamMemberInput"
-                                value="${team.members[3] == undefined ? "" : team.members[3]}"
+                                value="${team.members[3].name == undefined ? "" : team.members[3].name}"
                             >
                         </div>
+                        <div class="col">
+                        <input 
+                            id="${team.id}-member-email-3"
+                            class="teamInput teamMemberInput"
+                            value="${team.members[3].email == undefined ? "" : team.members[3].email}"
+                        >
+                    </div>
                     </div>
                 </div>
                 <div class="col-2 text-center scoreboardLegendText">
@@ -105,15 +134,16 @@ function renderTeamEditRows(teamsData) {
             const teamID = ev.target.id.split("-updateTeamButton")[0]; 
 
             const updatedTeamName = document.getElementById(`${teamID}-name`).value
-            const updatedMembers = []
-            document.querySelectorAll(`.teamMemberInput`).forEach(teamMemberBox => {
-                if (teamMemberBox.id.startsWith(teamID) && teamMemberBox.value != "") {
-                    updatedMembers.push(teamMemberBox.value)
-                }
-            })
-            const updatedScore = document.getElementById(`${teamID}-score`).value
+            // const updatedMembers = []
+            // document.querySelectorAll(`.teamMemberInput`).forEach(teamMemberBox => {
+            //     if (teamMemberBox.id.startsWith(teamID) && teamMemberBox.value != "") {
+            //         updatedMembers.push(teamMemberBox.value)
+            //     }
+            // })
+            // const updatedScore = document.getElementById(`${teamID}-score`).value
+            updatedTeamMembers = getTeamMemberNamesAndEmailsForTeamId(teamID)
   
-            updateTeam(teamID, updatedTeamName, updatedMembers, updatedScore).then(res => {
+            updateTeam(teamID, updatedTeamName, updatedTeamMembers, updatedScore).then(res => {
                 document.getElementById(`${teamID}-requestInfoBox`).textContent = res
                 getAndRenderTeamsData()
             }, err => {
@@ -140,12 +170,15 @@ function renderTeamEditRows(teamsData) {
 
 document.getElementById("createTeam-createTeamButton").addEventListener("click", () => {
     const newTeamName = document.getElementById(`createTeam-name`).value
-    const newTeamMembers = []
-    document.querySelectorAll(`.teamMemberInput`).forEach(teamMemberBox => {
-        if (teamMemberBox.id.startsWith("createTeam") && teamMemberBox.value != "") {
-            newTeamMembers.push(teamMemberBox.value)
-        }
-    })
+
+    // const newTeamMembers = []
+    // document.querySelectorAll(`.teamMemberInput`).forEach(teamMemberBox => {
+    //     if (teamMemberBox.id.startsWith("createTeam") && teamMemberBox.value != "") {
+    //         newTeamMembers.push(teamMemberBox.value)
+    //     }
+    // })
+    const newTeamMembers = getTeamMemberNamesAndEmailsForTeamId("createTeam")
+
     const newTeamScore = document.getElementById(`createTeam-score`).value
     createTeam(newTeamName, newTeamMembers, newTeamScore).then(res => {
         document.getElementById(`createTeam-requestInfoBox`).textContent = "Successfully created new team"
@@ -180,6 +213,37 @@ function getAndRenderProblems() {
     }, (err) => {
         console.error(err)
     })
+}
+
+function getTeamMemberNamesAndEmailsForTeamId(teamID) {
+    let teamMembers = []
+
+    let teamMemberNames = []
+    let teamMemberEmails = []
+
+    document.querySelectorAll(`.teamMemberInput`).forEach(teamMemberBox => {
+        if (teamMemberBox.id.startsWith(teamID)) {
+            if (teamMemberBox.id.includes("-member-name-")) {
+                teamMemberNames.push(teamMemberBox.value)
+            } else if (teamMemberBox.id.includes("-member-email-")) {
+                teamMemberEmails.push(teamMemberBox.value)
+            } else {
+                 console.error("teamMemberInput is not for user email or name")
+             }
+        }
+    })
+
+    if (teamMemberNames.length != teamMemberEmails.length) {
+        console.error(`Got ${teamMemberNames.length} names but only ${teamMemberEmails.length} emails for Id: ${teamID} (names: ${teamMemberNames}) (emails: ${teamMemberEmails})`)
+    }
+
+    for (let i = 0; i < teamMemberNames.length; i++) {
+        teamMembers.push({
+            "name": teamMemberNames[i],
+            "email": teamMemberEmails[i]
+        })
+    }
+    return teamMembers
 }
 
 function renderProblems(problems) {

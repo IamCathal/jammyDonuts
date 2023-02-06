@@ -60,13 +60,16 @@
                                     <h2 tabindex="1" style="font-weight: bold"> Create Team </h2>
                                 </div>
                                 <div class="row">
-                                    <div class="col-5 text-center scoreboardLegendText">
+                                    <div class="col-3 text-center scoreboardLegendText">
                                         Team Name
                                     </div>
-                                    <div class="col-5 text-center scoreboardLegendText">
+                                    <div class="col text-center scoreboardLegendText">
                                         Members
                                     </div>
-                                    <div class="col-2 text-center scoreboardLegendText">
+                                    <div class="col text-center scoreboardLegendText">
+                                        Emails
+                                    </div>
+                                    <div class="col-3 text-center scoreboardLegendText">
                                         Score
                                     </div>
                                 </div>
@@ -77,18 +80,26 @@
                                         <div class="row">
                                             <div class="col">
                                                 <div class="row pt-1">
-                                                    <div class="col-5">
+                                                    <div class="col-3">
                                                         <input 
                                                             id="createTeam-name"
                                                             class="teamInput"
                                                             value=""
+                                                            style="width: 100%"
                                                         >
                                                     </div>
-                                                    <div class="col-5 text-center scoreboardLegendText">
+                                                    <div class="col text-center scoreboardLegendText">
                                                         <div class="row pb-1">
                                                             <div class="col">
                                                                 <input 
-                                                                    id="createTeam-member-1"
+                                                                    id="createTeam-member-name-1"
+                                                                    class="teamInput teamMemberInput"
+                                                                    value=""
+                                                                >
+                                                            </div>
+                                                            <div class="col">
+                                                                <input 
+                                                                    id="createTeam-member-email-1"
                                                                     class="teamInput teamMemberInput"
                                                                     value=""
                                                                 >
@@ -97,7 +108,14 @@
                                                         <div class="row">
                                                             <div class="col">
                                                                 <input 
-                                                                    id="createTeam-member-2"
+                                                                    id="createTeam-member-name-2"
+                                                                    class="teamInput teamMemberInput"
+                                                                    value=""
+                                                                >
+                                                            </div>
+                                                            <div class="col">
+                                                                <input 
+                                                                    id="createTeam-member-email-2"
                                                                     class="teamInput teamMemberInput"
                                                                     value=""
                                                                 >
@@ -106,7 +124,14 @@
                                                         <div class="row pb-1">
                                                             <div class="col">
                                                                 <input 
-                                                                    id="createTeam-member-3"
+                                                                    id="createTeam-member-name-3"
+                                                                    class="teamInput teamMemberInput"
+                                                                    value=""
+                                                                >
+                                                            </div>
+                                                            <div class="col">
+                                                                <input 
+                                                                    id="createTeam-member-email-3"
                                                                     class="teamInput teamMemberInput"
                                                                     value=""
                                                                 >
@@ -115,7 +140,14 @@
                                                         <div class="row pb-1">
                                                             <div class="col">
                                                                 <input 
-                                                                    id="createTeam-member-3"
+                                                                    id="createTeam-member-name-4"
+                                                                    class="teamInput teamMemberInput"
+                                                                    value=""
+                                                                >
+                                                            </div>
+                                                            <div class="col">
+                                                                <input 
+                                                                    id="createTeam-member-email-4"
                                                                     class="teamInput teamMemberInput"
                                                                     value=""
                                                                 >
@@ -157,13 +189,16 @@
                                     <h2 tabindex="1" style="font-weight: bold"> Edit Teams </h2>
                                 </div>
                                 <div class="row">
-                                    <div class="col-5 text-center scoreboardLegendText">
+                                    <div class="col-3 text-center scoreboardLegendText">
                                         Team Name
                                     </div>
-                                    <div class="col-5 text-center scoreboardLegendText">
+                                    <div class="col text-center scoreboardLegendText">
                                         Members
                                     </div>
-                                    <div class="col-2 text-center scoreboardLegendText">
+                                    <div class="col text-center scoreboardLegendText">
+                                        Emails
+                                    </div>
+                                    <div class="col-3 text-center scoreboardLegendText">
                                         Score
                                     </div>
                                 </div>
@@ -171,76 +206,7 @@
                                 <div class="row">
                                     <div class="col" id="teamsEditRow">
 
-                                        <!-- <div class="row">
-                                            <div class="col">
-                                                <div class="row pt-1">
-                                                    <div class="col-5">
-                                                        <input 
-                                                            id="teamID-name"
-                                                            class="teamInput"
-                                                            value="Best Team 2"
-                                                        >
-                                                    </div>
-                                                    <div class="col-5 text-center scoreboardLegendText">
-                                                        <div class="row pb-1">
-                                                            <div class="col">
-                                                                <input 
-                                                                    id="teamID-member-1"
-                                                                    class="teamInput"
-                                                                    value="Mattress Mick"
-                                                                >
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                <input 
-                                                                    id="teamID-member-2"
-                                                                    class="teamInput"
-                                                                    value="Oran Nestor"
-                                                                >
-                                                            </div>
-                                                        </div>
-                                                        <div class="row pb-1">
-                                                            <div class="col">
-                                                                <input 
-                                                                    id="teamID-member-3"
-                                                                    class="teamInput"
-                                                                    value="Oran Nestor"
-                                                                >
-                                                            </div>
-                                                        </div>
-                                                        <div class="row pb-1">
-                                                            <div class="col">
-                                                                <input 
-                                                                    id="teamID-member-3"
-                                                                    class="teamInput"
-                                                                    value="Oran Nestor"
-                                                                >
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-2 text-center scoreboardLegendText">
-                                                        <input 
-                                                            id="teamID-score"
-                                                            class="teamInput"
-                                                            value="0"
-                                                            type="number"
-                                                        >
-                                                    </div>
-                                                </div>
-        
-                                                <div class="row pt-2 pb-3">
-                                                    <div class="col-2 text-center">
-                                                        <button class="updateTeamButton" id="teamID-updateTeamButton">
-                                                            Update team
-                                                        </button>
-                                                    </div>
-                                                    <div class="col" id="teamID-requestInfoBox">
-                                                       eeee
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
+                            
 
                                     </div>
 

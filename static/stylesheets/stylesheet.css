@@ -189,7 +189,7 @@ a {
   .teamInput {
       background-color: #22242f;
       border: 1px solid #c0c0c0;
-      width: 90%;
+      width: 100%;
   }
 
   .updateTeamButton, .createTeamButton, .createProblemButton {

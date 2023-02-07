@@ -14,29 +14,6 @@ db = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 app = Flask(__name__)
 sock = Sock(app)
 
-def main():
-    update = Thread(target=updateThread)
-    update.start()
-    app.run(host='0.0.0.0', port=9095)
-    pass
-
-
-def updateThread():
-    teams = util.getTeamsFromDB(db)
-    while True:
-        for team in teams:
-            util.updateScoreForTeam(db, team["id"], random.randint(1, 1099))
-            sleep(random.randint(20, 70))
-
-@app.route("/webex/createteamspace", methods=["POST"])
-def createTeamSpace():
-    teamId = request.args.get("teamid", "")
-    if teamId == "":
-        res = {"error": "teamid was empty"}
-        return Response(json.dumps(res), status=400, mimetype='application/json')
-    
-    webex.createTeamSpace(db, api, teamId)
-    return Response("hllo", status=200)
 
 @sock.route("/ws/teamupdates")
 def teamUpdates(ws):
@@ -61,10 +38,15 @@ def scoreUpdates(ws):
                 ws.send(message["data"])
 
 
-@app.route("/getrecentscoreupdates")
-def getRecentScoreUpdates():
-    res = json.dumps(util.getRecentScoreUpdates(db))
-    return Response(res, status=200, mimetype='application/json')
+@app.route("/webex/createteamspace", methods=["POST"])
+def createTeamSpace():
+    teamId = request.args.get("teamid", "")
+    if teamId == "":
+        res = {"error": "teamid was empty"}
+        return Response(json.dumps(res), status=400, mimetype='application/json')
+    
+    webex.createTeamSpace(db, api, teamId)
+    return Response("hllo", status=200)
 
 
 @app.route("/")
@@ -78,6 +60,12 @@ def dashboard():
     if password != "V2hlbiBmb29kIGlzIHNjYXJjZSBhbmQgeW91ciBsYXJkZXIgYmFyZQpBbmQgbm8gcmFzaGVycyBncmVhc2UgeW91ciBwYW4sCldoZW4gaHVuZ2VyIGdyb3dzIGFzIHlvdXIgbWVhbHMgYXJlIHJhcmUg4oCTCkEgcGludCBvZiBwbGFpbiBpcyB5b3VyIG9ubHkgbWFuLgoKSW4gdGltZSBvZiB0cm91YmxlIGFuZCBsb3VzZXkgc3RyaWZlLApZb3UgaGF2ZSBzdGlsbCBnb3QgYSBkYXJsaW50IHBsYW4KWW91IHN0aWxsIGNhbiB0dXJuIHRvIGEgYnJpZ2h0ZXIgbGlmZSDigJMKQSBwaW50IG9mIHBsYWluIGlzIHlvdXIgb25seSBtYW4u":
         return send_from_directory("pages", "index.html")
     return send_from_directory("pages", "dashboard.html")
+
+
+def getRecentScoreUpdates():
+    res = json.dumps(util.getRecentScoreUpdates(db))
+    return Response(res, status=200, mimetype='application/json')
+
 
 
 @app.route("/getteams")
@@ -199,9 +187,11 @@ def addProblem():
     util.addProblem(db, problemToAdd)
     return Response(json.dumps(util.getProblem(db, problemToAdd["problemId"])), status=200, mimetype='application/json')
 
+
 @app.route("/getproblems")
 def getProblems():
     return Response(json.dumps(util.getProblemsFromDb(db)), status=200, mimetype='application/json')
+
 
 @app.route("/getproblem")
 def getProblem():
@@ -217,12 +207,21 @@ def getProblem():
     
     return Response(json.dumps(problem), status=200, mimetype='application/json')
 
-# @app.route("/editproblem")
-# def editproblem():
-#     problemId = request.args.get("problemid", "")
-#     if problemId is None or problemId == "":
-#         res = {"error": "Invalid problemId given"}
-#         return Response(json.dumps(res), status=400, mimetype='application/json')
+
+def updateThread():
+    teams = util.getTeamsFromDB(db)
+    while True:
+        for team in teams:
+            util.updateScoreForTeam(db, team["id"], random.randint(1, 1099))
+            sleep(random.randint(20, 70))
+
+
+def main():
+    update = Thread(target=updateThread)
+    update.start()
+    app.run(host='0.0.0.0', port=9095)
+    pass
+
 
 if __name__ == "__main__":
     main()

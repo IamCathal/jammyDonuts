@@ -7,8 +7,8 @@ TEAMS = "teams"
 SCORE_UPDATES = "scoreUpdateLogs"
 PROBLEMS = "problems"
 
+
 def set(db, var: str, val: str):
-    # print(f"Set '{var}' as '{val}'")
     val = json.dumps(val)
     db.set(f"{JAM_DONUTS_PREFIX}{var}", val )
 
@@ -18,22 +18,6 @@ def getTeamsFromDB(db):
     if teams == "[]" or teams == None:
         return []
     return json.loads(teams)
-
-def getProblemsFromDb(db):
-    problems = db.get(f"{JAM_DONUTS_PREFIX}{PROBLEMS}")
-    if problems == "[]" or PROBLEMS == None:
-        return []
-    return json.loads(problems)
-
-
-def getProblemFromDB(db, problemId: str):
-    problems = getProblemsFromDb(db)
-
-    for problem in problems:
-        if problem["problemId"] == problemId:
-            return problem
-
-    return None
 
 
 def getTeam(db: dict, teamId: str) -> dict:
@@ -52,13 +36,6 @@ def doesTeamExist(db, teamId: str) -> dict:
             return True
     return False
 
-def doesProblemExist(db, problemId: str) -> dict:
-    allProblems = getProblemsFromDb(db)
-    for problem in allProblems:
-        if problem["problemId"] == problemId:
-            return True
-    return False
-
 
 def addTeam(db, team):
     set(db, TEAMS, json.dumps(team))
@@ -72,7 +49,6 @@ def addANewTeam(db, newTeam):
 
     for team in currTeams:
         if team["name"] == newTeam["name"]:
-            print("duplicate team insert")
             return
 
     currTeams.append(newTeam)
@@ -99,7 +75,6 @@ def updateTeam(db, teamToUpdate):
 
 def updateScoreForTeam(db, teamId: str, newScore: int):
     if doesTeamExist(db, teamId) == False:
-        print(f"team {teamId} does not exist")
         return
     
     allTeams = getTeamsFromDB(db)
@@ -118,7 +93,6 @@ def updateScoreForTeam(db, teamId: str, newScore: int):
 
 def addMember(db, teamId: str, memberName: str):
     if doesTeamExist(db, teamId) == False:
-        print(f"team {teamId} does not exist")
         return False
 
     allTeams = getTeamsFromDB(db)
@@ -134,7 +108,6 @@ def addMember(db, teamId: str, memberName: str):
 
 def removeMember(db, teamId: str, memberName: str):
     if doesTeamExist(db, teamId) == False:
-        print(f"team {teamId} does not exist")
         return False
 
     allTeams = getTeamsFromDB(db)
@@ -143,7 +116,6 @@ def removeMember(db, teamId: str, memberName: str):
             if memberName in team["members"]:
                 team["members"].remove(memberName)
             else:
-                print(f"member {memberName} does not exist in team {teamId}")
                 return False
 
     set(db, TEAMS, allTeams)
@@ -153,7 +125,6 @@ def removeMember(db, teamId: str, memberName: str):
 
 def removeTeam(db, teamId: str) -> bool:
     if doesTeamExist(db, teamId) == False:
-        print(f"team {teamId} does not exist")
         return False
 
     allTeams = getTeamsFromDB(db)
@@ -169,7 +140,6 @@ def removeTeam(db, teamId: str) -> bool:
 
 def getTeamName(db, teamId: str) -> str:
     if doesTeamExist(db, teamId) == False:
-        print(f"team {teamId} does not exist")
         return False
         
     return getTeam(db, teamId)["name"]
@@ -189,6 +159,31 @@ def addRecentScoreUpdate(db, newScoreUpdate):
     set(db, SCORE_UPDATES, allScoreUpdates)
 
 
+def getProblemsFromDb(db):
+    problems = db.get(f"{JAM_DONUTS_PREFIX}{PROBLEMS}")
+    if problems == "[]" or PROBLEMS == None:
+        return []
+    return json.loads(problems)
+
+
+def getProblemFromDB(db, problemId: str):
+    problems = getProblemsFromDb(db)
+
+    for problem in problems:
+        if problem["problemId"] == problemId:
+            return problem
+
+    return None
+
+
+def doesProblemExist(db, problemId: str) -> dict:
+    allProblems = getProblemsFromDb(db)
+    for problem in allProblems:
+        if problem["problemId"] == problemId:
+            return True
+    return False
+
+
 def addProblem(db, problemToAdd: dict):
     currentProblems = db.get(f"{JAM_DONUTS_PREFIX}{PROBLEMS}")
     if currentProblems == "[]" or currentProblems == None:
@@ -202,14 +197,6 @@ def addProblem(db, problemToAdd: dict):
 
     set(db, PROBLEMS, currentProblems)
 
+
 def getProblem(db, problemId: str) -> dict:
     return getProblemFromDB(db, problemId)
-
-# def editProblem(db, problemId: str):
-#     if doesProblemExist(db, problemId) == False:
-#         return False
-
-#     allProblems = getProblemsFromDb(db)
-#     allProblemsWithRequestedEdit
-#     for problem in allProblems:
-#         if problem["problemId"] == problemId

@@ -1,5 +1,5 @@
 getAndRenderTeamsData()
-getAndRenderProblems()
+// getAndRenderProblems()
 initWsTeamUpdateListener()
 
 function initWsTeamUpdateListener() {

@@ -62,6 +62,8 @@ def dashboard():
     return send_from_directory("pages", "dashboard.html")
 
 
+
+@app.route("/getrecentscoreupdates")
 def getRecentScoreUpdates():
     res = json.dumps(util.getRecentScoreUpdates(db))
     return Response(res, status=200, mimetype='application/json')

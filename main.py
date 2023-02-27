@@ -152,14 +152,14 @@ def removeMember():
 @app.route("/updatescore", methods=["POST"])
 def updateScore():
     teamId = request.args.get("teamid", "")
-    score = request.args.get("score", "")
+    newScoreDiff = request.args.get("scorediff", "", type=int)
 
-    if teamId == "" or score == "" or validate.isInt(score) == False:
+    if teamId == "":
         res = {"error": "Team name or score was invalid"}
         return Response(json.dumps(res), status=400, mimetype='application/json')
     
-    if util.updateScoreForTeam(db, teamId, score) == False:
-        res = {"error": f"Failed to update score to {score} for team {teamId}"}
+    if util.updateScoreForTeam(db, teamId, newScoreDiff) == False:
+        res = {"error": f"Failed to update score to {newScoreDiff} for team {teamId}"}
         return Response(json.dumps(res), status=400, mimetype='application/json')
 
     return Response(json.dumps(util.getTeam(db, teamId)), status=200, mimetype='application/json')
@@ -219,8 +219,8 @@ def updateThread():
 
 
 def main():
-    update = Thread(target=updateThread)
-    update.start()
+    # update = Thread(target=updateThread)
+    # update.start()
     app.run(host='0.0.0.0', port=9095)
     pass
 

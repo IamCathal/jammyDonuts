@@ -135,7 +135,6 @@ function getAndRenderMostRecentScoreUpdates() {
             </div>
             `
             recentScoreUpdateLogs.push(currFullLog)
-            console.log(recentScoreUpdateLogs.length)
             if (recentScoreUpdateLogs.length > MAX_LENGTH_LOGS) {
                 recentScoreUpdateLogs = recentScoreUpdateLogs.slice(1, MAX_LENGTH_LOGS+1)
             }

@@ -198,9 +198,20 @@ a {
       width: 100%;
   }
 
+  .addPointsButton {
+      width: 3.5rem;
+      background-color: #285013;
+      margin-right: 0.9rem;
+  }
+  
+  .takeAwayPointsButton {
+    width: 3.5rem;
+    background-color: #3c1212;
+    margin-right: 0.9rem;
+  }
+
   .deleteTeamButton {
     background-color: #141314;
     color: #b42d2d;
-    width: 100%;
     border-color: #b42d2d;
   }

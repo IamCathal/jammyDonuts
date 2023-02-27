@@ -1,6 +1,7 @@
 import json
-from this import d
+from datetime import datetime
 import uuid
+import sys
 
 JAM_DONUTS_PREFIX = "jamDonuts-"
 TEAMS = "teams"
@@ -73,22 +74,24 @@ def updateTeam(db, teamToUpdate):
     return True
 
 
-def updateScoreForTeam(db, teamId: str, newScore: int):
+def updateScoreForTeam(db, teamId: str, newScoreDiff: int):
     if doesTeamExist(db, teamId) == False:
         return
     
     allTeams = getTeamsFromDB(db)
     scoringTeam = ""
+
     for team in allTeams:
         if team["id"] == teamId:
-            scoreDifference = int(newScore) - team["score"]
-            team["score"] = int(newScore)
+            newScore = int(team["score"]) + newScoreDiff
+            team["score"] = newScore
             scoringTeam = team["name"]
 
     set(db, TEAMS, allTeams)
-    scoreUpdateString = f"{scoringTeam} gained {scoreDifference} points"
-    db.publish("scoreUpdate", scoreUpdateString)
-    db.publish('teamsUpdates', json.dumps(allTeams))
+    if newScoreDiff >= 1:
+        scoreUpdateString = f"{scoringTeam} gained {newScoreDiff} points"
+        db.publish("scoreUpdate", scoreUpdateString)
+        db.publish('teamsUpdates', json.dumps(allTeams))
 
 
 def addMember(db, teamId: str, memberName: str):
@@ -134,7 +137,7 @@ def removeTeam(db, teamId: str) -> bool:
             allTeamsWithoutRequestToBeDeletedTeam.append(team)
             
     set(db, TEAMS, allTeamsWithoutRequestToBeDeletedTeam)
-    db.publish("teamUpdates", allTeamsWithoutRequestToBeDeletedTeam)
+    db.publish("teamsUpdates", json.dumps(allTeamsWithoutRequestToBeDeletedTeam))
     return True
 
 
@@ -143,6 +146,7 @@ def getTeamName(db, teamId: str) -> str:
         return False
         
     return getTeam(db, teamId)["name"]
+
 
 def getRecentScoreUpdates(db):
     scoreUpdates = db.get(f"{JAM_DONUTS_PREFIX}{SCORE_UPDATES}")
@@ -157,46 +161,3 @@ def addRecentScoreUpdate(db, newScoreUpdate):
     if len(allScoreUpdates) > 20:
         allScoreUpdates = allScoreUpdates[:20]
     set(db, SCORE_UPDATES, allScoreUpdates)
-
-
-def getProblemsFromDb(db):
-    problems = db.get(f"{JAM_DONUTS_PREFIX}{PROBLEMS}")
-    if problems == "[]" or PROBLEMS == None:
-        return []
-    return json.loads(problems)
-
-
-def getProblemFromDB(db, problemId: str):
-    problems = getProblemsFromDb(db)
-
-    for problem in problems:
-        if problem["problemId"] == problemId:
-            return problem
-
-    return None
-
-
-def doesProblemExist(db, problemId: str) -> dict:
-    allProblems = getProblemsFromDb(db)
-    for problem in allProblems:
-        if problem["problemId"] == problemId:
-            return True
-    return False
-
-
-def addProblem(db, problemToAdd: dict):
-    currentProblems = db.get(f"{JAM_DONUTS_PREFIX}{PROBLEMS}")
-    if currentProblems == "[]" or currentProblems == None:
-        currentProblems = []
-    else:
-        currentProblems = json.loads(currentProblems)
-
-    problemToAdd["problemIndex"] = len(currentProblems)
-    problemToAdd["problemId"] = str(uuid.uuid1())
-    currentProblems.append(problemToAdd)
-
-    set(db, PROBLEMS, currentProblems)
-
-
-def getProblem(db, problemId: str) -> dict:
-    return getProblemFromDB(db, problemId)

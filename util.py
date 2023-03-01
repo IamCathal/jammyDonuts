@@ -1,7 +1,8 @@
 import json
 from datetime import datetime
 import uuid
-import sys
+import math
+import time
 
 JAM_DONUTS_PREFIX = "jamDonuts-"
 TEAMS = "teams"
@@ -88,10 +89,16 @@ def updateScoreForTeam(db, teamId: str, newScoreDiff: int):
             scoringTeam = team["name"]
 
     set(db, TEAMS, allTeams)
+
+    scoreUpdateString = ""
     if newScoreDiff >= 1:
         scoreUpdateString = f"{scoringTeam} gained {newScoreDiff} points"
-        db.publish("scoreUpdate", scoreUpdateString)
-        db.publish('teamsUpdates', json.dumps(allTeams))
+    else:
+        # When a score has been lowered do not broadcast
+        # this in the scoreboard feed
+        scoreUpdateString = ""
+    
+    publishScoreUpdate(db, scoreUpdateString)
 
 
 def addMember(db, teamId: str, memberName: str):
@@ -160,4 +167,15 @@ def addRecentScoreUpdate(db, newScoreUpdate):
     allScoreUpdates.insert(0, newScoreUpdate)
     if len(allScoreUpdates) > 20:
         allScoreUpdates = allScoreUpdates[:20]
+    
     set(db, SCORE_UPDATES, allScoreUpdates)
+
+
+def publishScoreUpdate(db, scoreUpdateMessage):
+    scoreObj = {
+        "time": math.floor(time.time()),
+        "message": scoreUpdateMessage
+    }
+    addRecentScoreUpdate(db, scoreObj)
+    db.publish("scoreUpdate", json.dumps(scoreObj))
+    db.publish("teamsUpdates", json.dumps(getTeamsFromDB(db)))

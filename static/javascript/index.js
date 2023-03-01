@@ -23,32 +23,34 @@ function initWsTeamUpdateListener() {
 function initWsScoreUpdateListener() {
     const socket = new WebSocket(`ws://${window.location.host}/ws/scoreupdates`);
       socket.addEventListener('message', ev => {
-        const newScoreText = ev.data
-
-        const now = new Date();
-        const currTimeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
-        const currFullLog = 
-        `
-        <div class="row teamScoreUpdateLogText pt-2 pb-2 pl-1 pr-1 mt-0 mb-0 ml-2" style="background-color: ${LOG_BACKGROUND_COLORS[backGroundColorPicker % LOG_BACKGROUND_COLORS.length]}">
-            <div class="col-10">
-                ${newScoreText}
+        const newScoreText = JSON.parse(JSON.parse(ev.data))
+        if (newScoreText.message != "") {
+            const scoreTime = new Date(newScoreText.time * 1000)
+            console.log(scoreTime)
+            const timeString = `${String(scoreTime.getHours()).padStart(2, '0')}:${String(scoreTime.getMinutes()).padStart(2, '0')}:${String(scoreTime.getSeconds()).padStart(2, '0')}`
+            const currFullLog = 
+            `
+            <div class="row teamScoreUpdateLogText pt-2 pb-2 pl-1 pr-1 mt-0 mb-0 ml-2" style="background-color: ${LOG_BACKGROUND_COLORS[backGroundColorPicker % LOG_BACKGROUND_COLORS.length]}">
+                <div class="col-10">
+                    ${newScoreText.message}
+                </div>
+                <div class="col" style="color:#c0c0c0">
+                    ${timeString}
+                </div>
             </div>
-            <div class="col" style="color:#c0c0c0">
-                ${currTimeString}
-            </div>
-        </div>
-        `
-        backGroundColorPicker++;
-        recentScoreUpdateLogs.push(currFullLog)
-        console.log(recentScoreUpdateLogs.length)
-        if (recentScoreUpdateLogs.length > MAX_LENGTH_LOGS) {
-            recentScoreUpdateLogs = recentScoreUpdateLogs.slice(1, MAX_LENGTH_LOGS+1)
+            `
+            backGroundColorPicker++;
+            recentScoreUpdateLogs.push(currFullLog)
+            console.log(recentScoreUpdateLogs.length)
+            if (recentScoreUpdateLogs.length > MAX_LENGTH_LOGS) {
+                recentScoreUpdateLogs = recentScoreUpdateLogs.slice(1, MAX_LENGTH_LOGS+1)
+            }
+    
+            document.getElementById("scoreUpdateLogCol").innerHTML = ""
+            recentScoreUpdateLogs.forEach(log => {
+                document.getElementById("scoreUpdateLogCol").innerHTML = log + document.getElementById("scoreUpdateLogCol").innerHTML;
+            })
         }
-
-        document.getElementById("scoreUpdateLogCol").innerHTML = ""
-        recentScoreUpdateLogs.forEach(log => {
-            document.getElementById("scoreUpdateLogCol").innerHTML = log + document.getElementById("scoreUpdateLogCol").innerHTML;
-        })
      
       });
 }
@@ -120,28 +122,35 @@ function getAndRenderScoreboardData() {
 function getAndRenderMostRecentScoreUpdates() {
     getRecentScoreboardUpdates().then(recentUpdates => {
         document.getElementById("scoreUpdateLogCol").innerHTML = ""
+
+        recentUpdates.sort(function(a, b) {
+            return a.time - b.time
+        })
+
         recentUpdates.forEach(recentUpdate => {
-            const now = new Date()
-            const currTimeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
-            const currFullLog = 
-            `
-            <div class="row teamScoreUpdateLogText pt-2 pb-2 pl-1 pr-1 mt-0 mb-0 ml-2" style="background-color: ${LOG_BACKGROUND_COLORS[backGroundColorPicker % LOG_BACKGROUND_COLORS.length]}">
-                <div class="col-10">
-                    ${recentUpdate}
+            if (recentUpdate.message != "") {
+                const scoreTime = new Date(recentUpdate.time * 1000)
+                const timeString = `${String(scoreTime.getHours()).padStart(2, '0')}:${String(scoreTime.getMinutes()).padStart(2, '0')}:${String(scoreTime.getSeconds()).padStart(2, '0')}`
+                
+                const currFullLog = 
+                `
+                <div class="row teamScoreUpdateLogText pt-2 pb-2 pl-1 pr-1 mt-0 mb-0 ml-2" style="background-color: ${LOG_BACKGROUND_COLORS[backGroundColorPicker % LOG_BACKGROUND_COLORS.length]}">
+                    <div class="col-10">
+                        ${recentUpdate.message}
+                    </div>
+                    <div class="col" style="color:#c0c0c0">
+                        ${timeString}
+                    </div>
                 </div>
-                <div class="col" style="color:#c0c0c0">
-                    ${currTimeString}
-                </div>
-            </div>
-            `
-            recentScoreUpdateLogs.push(currFullLog)
-            if (recentScoreUpdateLogs.length > MAX_LENGTH_LOGS) {
-                recentScoreUpdateLogs = recentScoreUpdateLogs.slice(1, MAX_LENGTH_LOGS+1)
+                `
+                recentScoreUpdateLogs.push(currFullLog)
+                if (recentScoreUpdateLogs.length > MAX_LENGTH_LOGS) {
+                    recentScoreUpdateLogs = recentScoreUpdateLogs.slice(1, MAX_LENGTH_LOGS+1)
+                }
+    
+                backGroundColorPicker++;
+                document.getElementById("scoreUpdateLogCol").innerHTML = currFullLog + document.getElementById("scoreUpdateLogCol").innerHTML;
             }
-
-
-            backGroundColorPicker++;
-            document.getElementById("scoreUpdateLogCol").innerHTML = currFullLog + document.getElementById("scoreUpdateLogCol").innerHTML;
         })
     }, (err) => {
         console.error(err)

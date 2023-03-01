@@ -1,7 +1,6 @@
 from sre_constants import SUCCESS
 import redis
 import util
-import webex
 import validate
 import json
 from flask import Flask, Response, request, send_from_directory
@@ -30,12 +29,10 @@ def teamUpdates(ws):
 def scoreUpdates(ws):
     subscription = db.pubsub()
     subscription.subscribe("scoreUpdate")
-    lastTwentyUpdates = []
     while True:
         for message in subscription.listen():
             if message["data"] is not None and isinstance(message["data"], str):
-                util.addRecentScoreUpdate(db, message["data"])
-                ws.send(message["data"])
+                ws.send(json.dumps(message["data"]))
 
 
 @app.route("/webex/createteamspace", methods=["POST"])

@@ -11,13 +11,6 @@ def isValidListOfTeams(teams: list) -> bool:
     return True
     
 
-def isValidProblem(problem: dict) -> bool:
-    problemText = ("problemText" in problem) and (
-        problem["problemText"] != None and problem["problemText"] != "")
-    problemAnswer = ("problemAnswer" in problem) and (
-        problem["problemAnswer"] != None and problem["problemAnswer"] != "")
-    return problemText and problemAnswer
-
 def isInt(intStr: str) -> bool:
     try:
         intVal = int(intStr)

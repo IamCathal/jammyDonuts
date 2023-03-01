@@ -230,60 +230,6 @@ function getTeamMemberNamesForTeamId(teamID) {
     return teamMembers
 }
 
-function renderProblems(problems) {
-    let output = ``
-
-    problems.forEach(problem => {
-
-        output += `
-        
-    <div class="row">
-        <div class="col">
-            <div class="row pt-1">
-                <div class="col-9">
-                    <textarea 
-                        id="${problem.problemId}-problemText"
-                        class="teamInput"
-                        contenteditable="true"
-                        style="width: 95%"
-                    >
-                    ${problem.problemText}
-                    </textarea>
-                </div>
-                <div class="col-3 scoreboardLegendText">
-                    <div class="row pb-1">
-                        <div class="col">
-                            <textarea 
-                                id="${problem.problemId}-answer"
-                                class="teamInput teamMemberInput"
-                                contenteditable="true"
-                                style="width: 95%"
-                            >
-                            ${problem.problemAnswer}
-                            </textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row pt-2 pb-3">
-                <div class="col-2 text-center">
-                    <!-- <button class="createProblemButton" id="createTeam-createTeamButton">
-                        Update Problem
-                    </button> -->
-                </div>
-                <div class="col" id="${problem.problemId}}-requestInfoBox">
-                   
-                </div>
-            </div>
-        </div>
-    </div>
-        `
-    })
-    document.getElementById("problemsEditRow").innerHTML = ""
-    document.getElementById("problemsEditRow").innerHTML += output;
-}
-
 function updateTeam(teamID, updatedName, updatedMembers, updatedScore) {
     return new Promise((resolve, reject) => {
         fetch(`/updateteam`, {

@@ -6,8 +6,9 @@ import time
 
 JAM_DONUTS_PREFIX = "jamDonuts-"
 TEAMS = "teams"
-SCORE_UPDATES = "scoreUpdateLogs"
-PROBLEMS = "problems"
+
+SCORE_UPDATES = "scoreUpdates"
+TEAM_UPDATES = "teamsUpdates"
 
 
 def set(db, var: str, val: str):
@@ -55,7 +56,7 @@ def addANewTeam(db, newTeam):
 
     currTeams.append(newTeam)
     set(db, TEAMS, currTeams)
-    db.publish('teamsUpdates', json.dumps(currTeams))
+    db.publish(TEAM_UPDATES, json.dumps(currTeams))
 
 
 def updateTeam(db, teamToUpdate):
@@ -71,7 +72,7 @@ def updateTeam(db, teamToUpdate):
             updatedAllTeams.append(team)
 
     set(db, TEAMS, updatedAllTeams)
-    db.publish('teamsUpdates', json.dumps(updatedAllTeams))
+    db.publish(TEAM_UPDATES, json.dumps(updatedAllTeams))
     return True
 
 
@@ -112,7 +113,7 @@ def addMember(db, teamId: str, memberName: str):
             team["members"] = list(dict.fromkeys(team["members"]))
 
     set(db, TEAMS, allTeams)
-    db.publish('teamsUpdates', json.dumps(allTeams))
+    db.publish(TEAM_UPDATES, json.dumps(allTeams))
     return True
 
 
@@ -129,7 +130,7 @@ def removeMember(db, teamId: str, memberName: str):
                 return False
 
     set(db, TEAMS, allTeams)
-    db.publish("teamUpdates", allTeams)
+    db.publish(TEAM_UPDATES, allTeams)
     return True
 
 
@@ -144,7 +145,7 @@ def removeTeam(db, teamId: str) -> bool:
             allTeamsWithoutRequestToBeDeletedTeam.append(team)
             
     set(db, TEAMS, allTeamsWithoutRequestToBeDeletedTeam)
-    db.publish("teamsUpdates", json.dumps(allTeamsWithoutRequestToBeDeletedTeam))
+    db.publish(TEAM_UPDATES, json.dumps(allTeamsWithoutRequestToBeDeletedTeam))
     return True
 
 
@@ -177,5 +178,5 @@ def publishScoreUpdate(db, scoreUpdateMessage):
         "message": scoreUpdateMessage
     }
     addRecentScoreUpdate(db, scoreObj)
-    db.publish("scoreUpdate", json.dumps(scoreObj))
-    db.publish("teamsUpdates", json.dumps(getTeamsFromDB(db)))
+    db.publish(SCORE_UPDATES, json.dumps(scoreObj))
+    db.publish(TEAM_UPDATES, json.dumps(getTeamsFromDB(db)))

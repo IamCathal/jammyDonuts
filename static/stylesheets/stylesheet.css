@@ -192,7 +192,7 @@ a {
       width: 100%;
   }
 
-  .updateTeamButton, .createTeamButton, .createProblemButton {
+  .updateTeamButton, .createTeamButton {
       background-color: #141314;
       color: white;
       width: 100%;

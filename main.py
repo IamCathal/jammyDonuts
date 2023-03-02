@@ -9,7 +9,7 @@ from time import sleep
 from flask_sock import Sock
 import random
 
-db = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+db = redis.Redis(host="redis", port=6379, db=0, decode_responses=True)
 app = Flask(__name__)
 sock = Sock(app)
 
@@ -171,8 +171,6 @@ def updateThread():
 
 
 def main():
-    # update = Thread(target=updateThread)
-    # update.start()
     app.run(host='0.0.0.0', port=9095)
     pass
 

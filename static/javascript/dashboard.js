@@ -2,7 +2,7 @@ getAndRenderTeamsData()
 initWsTeamUpdateListener()
 
 function initWsTeamUpdateListener() {
-    const socket = new WebSocket(`ws://${window.location.host}/ws/teamupdates`);
+    const socket = new WebSocket(`wss://${window.location.host}/ws/teamupdates`);
       socket.addEventListener('message', ev => {
         const newTeams = JSON.parse(ev.data)
         renderTeamEditRows(newTeams)

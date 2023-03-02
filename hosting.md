@@ -38,11 +38,11 @@ Now get nginx working and HTTPs enabled
 sudo apt install nginx
 ```
 
-To setup the reverse proxy follow from Step 2 listed [here on digital ocean](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-18-04#step-2-confirming-nginx-s-configuration)
+To setup the reverse proxy follow from Step 2 listed [here on digital ocean](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-go-web-application-using-nginx-on-ubuntu-18-04)
 
 [Add the necessary upgrade header rules](https://www.serverlab.ca/tutorials/linux/web-servers-linux/how-to-configure-nginx-for-websockets/) to let nginx know that websockets should be allowed
 
-Purchase a domain, point the DNS to the cloud instance and then follow through with enabling HTTPS through NGINX [also here in this digital ocean guide](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-18-04#step-2-confirming-nginx-s-configuration). Make sure the firewall rules are tight
+Purchase a domain, point the DNS to the cloud instance and then follow through with enabling HTTPS through NGINX [also here in this digital ocean guide](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-18-04). Make sure the firewall rules are tight
 
 and yeow. its working
 

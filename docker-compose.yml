@@ -30,6 +30,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 9999:8080
+    environment:
+      - DOZZLE_USERNAME=paulblartmallcop
+      - DOZZLE_PASSWORD=oneofthemoviesofalltime
+      - DOZZLE_NO_ANALYTICS=true
     restart: on-failure
     networks:
       - elk

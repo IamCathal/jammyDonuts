@@ -17,7 +17,7 @@ isScoreboardHidden().then(isHidden => {
 })
 
 function initWsTeamUpdateListener() {
-    const socket = new WebSocket(`ws://${window.location.host}/ws/teamupdates`);
+    const socket = new WebSocket(`wss://${window.location.host}/ws/teamupdates`);
       socket.addEventListener('message', ev => {
         const newTeams = JSON.parse(ev.data)
         // document.getElementById("lastUpdatedInfo").textContent = `Last updated ${timeSince(lastUpdatedTime)} ago`;
@@ -27,7 +27,7 @@ function initWsTeamUpdateListener() {
 }
 
 function initwscoreUpdateListener() {
-    const socket = new WebSocket(`ws://${window.location.host}/ws/scoreupdates`);
+    const socket = new WebSocket(`wss://${window.location.host}/ws/scoreupdates`);
       socket.addEventListener('message', ev => {
         const newScoreText = JSON.parse(JSON.parse(ev.data))
         if (newScoreText.message != "") {

@@ -1,14 +1,24 @@
 getAndRenderTeamsData()
 initWsTeamUpdateListener()
+getAndRenderScoreBoardVisibilityStatus()
 
 function initWsTeamUpdateListener() {
-    const socket = new WebSocket(`wss://${window.location.host}/ws/teamupdates`);
+    const socket = new WebSocket(`ws://${window.location.host}/ws/teamupdates`);
       socket.addEventListener('message', ev => {
         const newTeams = JSON.parse(ev.data)
         renderTeamEditRows(newTeams)
       });
 }
 
+function getAndRenderScoreBoardVisibilityStatus() {
+    isScoreboardHidden().then(isHidden => {
+        if (isHidden) {
+            document.getElementById("scoreboardHiddenStatus").textContent = "Scoreboard is currently HIDDEN"
+        } else {
+            document.getElementById("scoreboardHiddenStatus").textContent = "Scoreboard is currently VISIBLE"
+        }
+    })
+}
 function renderTeamEditRows(teamsData) {
     document.getElementById("teamsEditRow").innerHTML = ""
     // TODO SANITISE THIS INPUT
@@ -178,6 +188,19 @@ function renderTeamEditRows(teamsData) {
     })
 }
 
+document.getElementById("hideScoreboardButton").addEventListener("click", (ev) => {
+    hideScoreboard().then(nothing => {
+        location.reload()
+    })
+})
+
+document.getElementById("showScoreboardButton").addEventListener("click", (ev) => {
+    showScoreboard().then(nothing => {
+        location.reload()
+    })
+})
+
+
 document.getElementById("createTeam-createTeamButton").addEventListener("click", () => {
     const newTeamName = document.getElementById(`createTeam-name`).value
 
@@ -325,6 +348,61 @@ function sendScoreDiff(teamId, scoreDiff) {
         }).then((res) => res.json())
         .then((res) => {
             resolve(res)
+        }, (err) => {
+            reject(err)
+        });
+    })
+}
+
+function hideScoreboard() {
+    return new Promise((resolve, reject) => {
+        fetch(`/hidethescoreboard`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        }).then((res) => res.json())
+        .then((res) => {
+            resolve()
+        }, (err) => {
+            reject(err)
+        });
+    })
+}
+
+function showScoreboard() {
+    return new Promise((resolve, reject) => {
+        fetch(`/showthescoreboard`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        }).then((res) => res.json())
+        .then((res) => {
+            resolve()
+        }, (err) => {
+            reject(err)
+        });
+    })
+}
+
+function isScoreboardHidden() {
+    return new Promise((resolve, reject) => {
+        fetch(`/isscoreboardhidden`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        }).then((res) => res.json())
+        .then((res) => {
+            if (res.value == false) {
+                resolve(false);
+            } else {
+                resolve(true)
+            }
         }, (err) => {
             reject(err)
         });

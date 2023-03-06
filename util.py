@@ -6,6 +6,7 @@ import time
 
 JAM_DONUTS_PREFIX = "jamDonuts-"
 TEAMS = "teams"
+SHOW_SCOREBOARD = "showScoreboard"
 
 SCORE_UPDATES = "scoreUpdates"
 TEAM_UPDATES = "teamsUpdates"
@@ -22,6 +23,16 @@ def getTeamsFromDB(db):
         return []
     return json.loads(teams)
 
+def getShouldScoreScoreboardFromDB(db):
+    if db.get(f"{JAM_DONUTS_PREFIX}{SHOW_SCOREBOARD}") == None:
+        set(db, SHOW_SCOREBOARD, 0)
+        return getShouldScoreScoreboardFromDB(db)
+
+    shouldHide = db.get(f"{JAM_DONUTS_PREFIX}{SHOW_SCOREBOARD}")
+    if shouldHide == "0":
+        return False
+    else:
+        return True
 
 def getTeam(db: dict, teamId: str) -> dict:
     teams = getTeamsFromDB(db)
@@ -180,3 +191,31 @@ def publishScoreUpdate(db, scoreUpdateMessage):
     addRecentScoreUpdate(db, scoreObj)
     db.publish(SCORE_UPDATES, json.dumps(scoreObj))
     db.publish(TEAM_UPDATES, json.dumps(getTeamsFromDB(db)))
+
+
+def showScoreboard(db):
+    set(db, SHOW_SCOREBOARD, 0)
+
+def hideScoreboard(db):
+    set(db, SHOW_SCOREBOARD, 1)
+
+def shouldBlockRequest(db, requestHeaders, dashboardPass):
+    if getShouldScoreScoreboardFromDB(db) == "True":
+        return True
+    if requestHeaders.get('Referer') == None:
+        return True
+    if dashboardPass not in requestHeaders.get('Referer'):
+        return True
+    return False
+
+def shouldShowScoreboard(db):
+    if getShouldScoreScoreboardFromDB(db) == 0:
+        return False
+    return True
+
+def isAdminRequest(db, requestHeaders, dashboardPass):
+    if requestHeaders.get('Referer') == None:
+        return False
+    if dashboardPass not in requestHeaders.get('Referer'):
+        return False
+    return True

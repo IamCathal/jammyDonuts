@@ -5,13 +5,19 @@ const MAX_LENGTH_LOGS = 15
 const LOG_BACKGROUND_COLORS = ["#211d21", "#292729"]
 let backGroundColorPicker = 0
 
-getAndRenderScoreboardData()
-getAndRenderMostRecentScoreUpdates()
-initWsTeamUpdateListener()
-initWsScoreUpdateListener()
+isScoreboardHidden().then(isHidden => {
+    if (!isHidden) {
+        getAndRenderScoreboardData()
+        getAndRenderMostRecentScoreUpdates()
+        initWsTeamUpdateListener()
+        initwscoreUpdateListener()
+    } else {
+        document.getElementById("scoreboardIsHidden").textContent = "Scoreboard is hidden at the moment. Check back later"
+    }
+})
 
 function initWsTeamUpdateListener() {
-    const socket = new WebSocket(`wss://${window.location.host}/ws/teamupdates`);
+    const socket = new WebSocket(`ws://${window.location.host}/ws/teamupdates`);
       socket.addEventListener('message', ev => {
         const newTeams = JSON.parse(ev.data)
         // document.getElementById("lastUpdatedInfo").textContent = `Last updated ${timeSince(lastUpdatedTime)} ago`;
@@ -20,13 +26,12 @@ function initWsTeamUpdateListener() {
       });
 }
 
-function initWsScoreUpdateListener() {
-    const socket = new WebSocket(`wss://${window.location.host}/ws/scoreupdates`);
+function initwscoreUpdateListener() {
+    const socket = new WebSocket(`ws://${window.location.host}/ws/scoreupdates`);
       socket.addEventListener('message', ev => {
         const newScoreText = JSON.parse(JSON.parse(ev.data))
         if (newScoreText.message != "") {
             const scoreTime = new Date(newScoreText.time * 1000)
-            console.log(scoreTime)
             const timeString = `${String(scoreTime.getHours()).padStart(2, '0')}:${String(scoreTime.getMinutes()).padStart(2, '0')}:${String(scoreTime.getSeconds()).padStart(2, '0')}`
             const currFullLog = 
             `
@@ -209,4 +214,25 @@ function timeSince(targetDate) {
         return Math.floor(interval) + "m";
     }
     return Math.floor(seconds) + "s";
+}
+
+function isScoreboardHidden() {
+    return new Promise((resolve, reject) => {
+        fetch(`/isscoreboardhidden`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        }).then((res) => res.json())
+        .then((res) => {
+            if (res.value == false) {
+                resolve(false);
+            } else {
+                resolve(true)
+            }
+        }, (err) => {
+            reject(err)
+        });
+    })
 }

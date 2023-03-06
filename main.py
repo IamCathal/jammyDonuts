@@ -9,10 +9,11 @@ from time import sleep
 from flask_sock import Sock
 import random
 
-db = redis.Redis(host="redis", port=6379, db=0, decode_responses=True)
+DASHBOARD_PASS = "V2hlbiBmb29kIGlzIHNjYXJjZSBhbmQgeW91ciBsYXJkZXIgYmFyZQpBbmQgbm8gcmFzaGVycyBncmVhc2UgeW91ciBwYW4sCldoZW4gaHVuZ2VyIGdyb3dzIGFzIHlvdXIgbWVhbHMgYXJlIHJhcmUg4oCTCkEgcGludCBvZiBwbGFpbiBpcyB5b3VyIG9ubHkgbWFuLgoKSW4gdGltZSBvZiB0cm91YmxlIGFuZCBsb3VzZXkgc3RyaWZlLApZb3UgaGF2ZSBzdGlsbCBnb3QgYSBkYXJsaW50IHBsYW4KWW91IHN0aWxsIGNhbiB0dXJuIHRvIGEgYnJpZ2h0ZXIgbGlmZSDigJMKQSBwaW50IG9mIHBsYWluIGlzIHlvdXIgb25seSBtYW4u"
+
+db = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 app = Flask(__name__)
 sock = Sock(app)
-
 
 @sock.route("/ws/teamupdates")
 def teamUpdates(ws):
@@ -42,19 +43,60 @@ def index():
 @app.route("/dashboard")
 def dashboard():
     password = request.args.get("password")
-    if password != "V2hlbiBmb29kIGlzIHNjYXJjZSBhbmQgeW91ciBsYXJkZXIgYmFyZQpBbmQgbm8gcmFzaGVycyBncmVhc2UgeW91ciBwYW4sCldoZW4gaHVuZ2VyIGdyb3dzIGFzIHlvdXIgbWVhbHMgYXJlIHJhcmUg4oCTCkEgcGludCBvZiBwbGFpbiBpcyB5b3VyIG9ubHkgbWFuLgoKSW4gdGltZSBvZiB0cm91YmxlIGFuZCBsb3VzZXkgc3RyaWZlLApZb3UgaGF2ZSBzdGlsbCBnb3QgYSBkYXJsaW50IHBsYW4KWW91IHN0aWxsIGNhbiB0dXJuIHRvIGEgYnJpZ2h0ZXIgbGlmZSDigJMKQSBwaW50IG9mIHBsYWluIGlzIHlvdXIgb25seSBtYW4u":
+    if password != DASHBOARD_PASS:
         return send_from_directory("pages", "index.html")
     return send_from_directory("pages", "dashboard.html")
 
 
+@app.route("/hidethescoreboard")
+def hideScoreboard():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS) == False:
+        print("not admin for hide")
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+
+    util.hideScoreboard(db)
+    return "false"
+
+
+@app.route("/showthescoreboard")
+def showScoreboard():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS) == False:
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+        
+    util.showScoreboard(db)
+    return "true"
+
+
+@app.route("/isscoreboardhidden")
+def shouldShowScoreboard():
+    jsonResponse = {
+        "value": util.getShouldScoreScoreboardFromDB(db)
+    }
+    return Response(json.dumps(jsonResponse), status=200, mimetype='application/json')
+
+
 @app.route("/getrecentscoreupdates")
 def getRecentScoreUpdates():
+    if util.shouldShowScoreboard(db):
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+
     res = json.dumps(util.getRecentScoreUpdates(db))
     return Response(res, status=200, mimetype='application/json')
 
 
 @app.route("/getteams")
 def getTeams():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS):
+        res = json.dumps(util.getTeamsFromDB(db))
+        return Response(res, status=200, mimetype='application/json')
+
+    if util.shouldShowScoreboard(db):
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+    
     res = json.dumps(util.getTeamsFromDB(db))
     return Response(res, status=200, mimetype='application/json')
 
@@ -76,6 +118,10 @@ def getTeam():
 
 @app.route("/addteam", methods=["POST"])
 def addTeam():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS) == False:
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+
     team = request.get_json()
     teamObj = team
     if validate.isValidTeam(teamObj) == True:
@@ -88,6 +134,10 @@ def addTeam():
 
 @app.route("/removeteam", methods=["POST"])
 def removeTeam():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS) == False:
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+
     teamId = request.args.get("teamid", "")
     if teamId == "":
         res = {"error": "Team name or membername was empty"}
@@ -102,6 +152,10 @@ def removeTeam():
     
 @app.route("/addmember", methods=["POST"])
 def addMember():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS) == False:
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+
     teamId = request.args.get("teamid", "")
     memberName = request.args.get("membername", "")
 
@@ -118,6 +172,10 @@ def addMember():
 
 @app.route("/removemember", methods=["POST"])
 def removeMember():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS) == False:
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+
     teamId = request.args.get("teamid", "")
     memberName = request.args.get("membername", "")
 
@@ -134,6 +192,10 @@ def removeMember():
 
 @app.route("/updatescore", methods=["POST"])
 def updateScore():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS) == False:
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+        
     teamId = request.args.get("teamid", "")
     newScoreDiff = request.args.get("scorediff", "", type=int)
 
@@ -150,6 +212,10 @@ def updateScore():
 
 @app.route("/updateteam", methods=["POST"])
 def updateTeam():
+    if util.isAdminRequest(db, request.headers, DASHBOARD_PASS) == False:
+        res = {}
+        return Response(json.dumps(res), status=200, mimetype='application/json')
+        
     teamToUpdate = request.get_json()
     if validate.isValidTeam(teamToUpdate) == False:
         res = {"error": f"Team {teamToUpdate['id']} was invalid"}

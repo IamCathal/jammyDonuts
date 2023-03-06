@@ -1,15 +1,15 @@
 version: '3.2'
 
 services:
-  cisco-jam:
-    build:
-      context: .
-    volumes:
-      - ./static:/static/
-    ports:
-      - 9095:9095
-    networks:
-      - elk
+  # cisco-jam:
+  #   build:
+  #     context: .
+  #   volumes:
+  #     - ./static:/static/
+  #   ports:
+  #     - 9095:9095
+  #   networks:
+  #     - elk
 
   redis:
     image: docker.io/bitnami/redis:7.0
@@ -23,20 +23,20 @@ services:
     networks:
       - elk
 
-  dozzle:
-    container_name: dozzle
-    image: amir20/dozzle:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 9999:8080
-    environment:
-      - DOZZLE_USERNAME=paulblartmallcop
-      - DOZZLE_PASSWORD=oneofthemoviesofalltime
-      - DOZZLE_NO_ANALYTICS=true
-    restart: on-failure
-    networks:
-      - elk
+  # dozzle:
+  #   container_name: dozzle
+  #   image: amir20/dozzle:latest
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   ports:
+  #     - 9999:8080
+  #   environment:
+  #     - DOZZLE_USERNAME=paulblartmallcop
+  #     - DOZZLE_PASSWORD=oneofthemoviesofalltime
+  #     - DOZZLE_NO_ANALYTICS=true
+  #   restart: on-failure
+  #   networks:
+  #     - elk
 
 
 networks:
